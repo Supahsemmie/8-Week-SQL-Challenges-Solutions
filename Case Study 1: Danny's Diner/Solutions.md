@@ -27,7 +27,7 @@ GROUP BY customer_id
 
 **(Optional) Google Sheets graph:**
 
-Diagram
+![](images/total_spend_per_customer.png)
 
 2. *How many days has each customer visited the restaurant?*
 
