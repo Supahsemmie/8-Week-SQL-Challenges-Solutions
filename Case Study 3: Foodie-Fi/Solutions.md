@@ -89,7 +89,8 @@ GROUP BY date(start_date, 'start of month')
 
 **Distribution graph:**
 
-Diagram
+![](images/Trials_per_month_2020.png)
+
 **Note:**
 
 - Months were renamed manually in Google Sheets for readability.
