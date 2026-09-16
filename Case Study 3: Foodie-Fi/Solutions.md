@@ -1,4 +1,4 @@
-**Foodie-Fi**
+# **Foodie-Fi**
 
 
 
@@ -12,6 +12,7 @@ Queries written in (DB browser for) SQlite. 
 
 *Based off the 8 sample customers provided in the sample from the* *`subscriptions`* *table, write a brief description about each customer’s onboarding journey.*
 *Try to keep it as short as possible - you may also want to run some sort of join to make your explanations a bit easier!*
+
 **Query:**
 
 ```sql
@@ -89,7 +90,7 @@ GROUP BY date(start_date, 'start of month')
 
 **Distribution graph:**
 
-![](images/Trials_per_month_2020.png)
+![](images/trials_per_month_2020.png)
 
 **Note:**
 
@@ -251,8 +252,10 @@ GROUP BY plan_name
 | pro monthly   | 326       | 32.6           |
 | trial         | 19        | 1.9            |
 
-**Note: **
+**Note:**
+
 Since “start\_date” cannot track more precisely than the day of the subscription, we won't be able to tell what the current plan of a customer is if they change their subscription on the same day. In those cases, “row\_number” will arbitrarily choose one plan.
+
 The following query counts the occurrences of more than 1 subscription change in a day: 
 
 ```sql
@@ -315,6 +318,7 @@ FROM times_to_annual
 | 105.0                                   |
 
 **Note:**
+
 In this query we have assumed that every customer only upgrades to an annual plan once, and does not downgrade and then upgrade again later. This is justified by the following checking query returning no rows (which actually checks this for all plans at once, not just the annual plans):
 
 ```sql
@@ -332,48 +336,10 @@ If there were any duplicates, we would have to rewrite our query to find the **m
 
 10. *Can you further breakdown this average value into 30 day periods (i.e. 0-30 days, 31-60 days etc)*
 
-**Query:**
+**Answer:**
 
-```sql
-WITH trial_dates AS (
-    SELECT customer_id, start_date AS trial_date
-    FROM subscriptions
-    WHERE plan_id = 0
-),
-annual_dates AS (
-    SELECT customer_id, start_date AS annual_date
-    FROM subscriptions
-    WHERE plan_id = 3
-),
-times_to_annual AS (
-    SELECT customer_id, julianday(annual_date) - julianday(trial_date) AS time_to_annual 
-    FROM trial_dates
-    JOIN annual_dates USING (customer_id)
-)
-SELECT 
-    COUNT(CASE WHEN time_to_annual BETWEEN 0 and 30 THEN 1 END) AS "0-30 days",
-    COUNT(CASE WHEN time_to_annual BETWEEN 31 and 60 THEN 1 END) AS "31-60 days",
-    COUNT(CASE WHEN time_to_annual BETWEEN 61 and 90 THEN 1 END) AS "61-90 days",
-    COUNT(CASE WHEN time_to_annual BETWEEN 91 and 120 THEN 1 END) AS "91-120 days",
-    COUNT(CASE WHEN time_to_annual BETWEEN 121 and 150 THEN 1 END) AS "121-150 days",
-    COUNT(CASE WHEN time_to_annual BETWEEN 151 and 180 THEN 1 END) AS "151-180 days",
-    COUNT(CASE WHEN time_to_annual BETWEEN 181 and 210 THEN 1 END) AS "181-210 days",
-    COUNT(CASE WHEN time_to_annual BETWEEN 211 and 240 THEN 1 END) AS "211-240 days",
-    COUNT(CASE WHEN time_to_annual BETWEEN 241 and 270 THEN 1 END) AS "241-270 days",
-    COUNT(CASE WHEN time_to_annual BETWEEN 271 and 300 THEN 1 END) AS "271-300 days",
-    COUNT(CASE WHEN time_to_annual BETWEEN 301 and 330 THEN 1 END) AS "301-330 days",
-    COUNT(CASE WHEN time_to_annual BETWEEN 331 and 360 THEN 1 END) AS "331-360 days"
-FROM times_to_annual
-```
+The idea  is to take “time\_to\_annual” and divide it by 30, then take the ceiling (rounded up) of that value. For example any number (except 0) between 0 and 30 divided by 30 will round up to 1, and any number between 31 and 60 divided by 30 will round up to 2 etc. Once we have all the “time\_to\_annual” values grouped like this, we can directly count them.
 
-**Result:**
-
-| **0-30 days** | **31-60 days** | **61-90 days** | **91-120 days** | **121-150 days** | **151-180 days** | **181-210 days** | **211-240 days** | **241-270 days** | **271-300 days** | **301-330 days** | **331-360 days** |
-| ------------- | -------------- | -------------- | --------------- | ---------------- | ---------------- | ---------------- | ---------------- | ---------------- | ---------------- | ---------------- | ---------------- |
-| 49            | 24             | 34             | 35              | 42               | 36               | 26               | 4                | 5                | 1                | 1                | 1                |
-
-**Note:**
-This is clearly a hard coded approach, so I want to try and make this more scalable/elegant. The idea now is to take “time\_to\_annual” and divide it by 30, then take the ceiling (rounded up) of that value. For example any number (except 0) between 0 and 30 divided by 30 will round up to 1, and any number between 31 and 60 divided by 30 will round up to 2 etc. Once we have all the “time\_to\_annual” values grouped like this, we can directly count them.
 **Query:**
 
 ```sql
@@ -430,8 +396,9 @@ FROM day_breakdown
 | 301-330           | 1          |
 | 331-360           | 1          |
 
-**Distribution graph: **
-**Diagram**
+**Distribution graph:**
+
+![](images/day_distribution_annual_plan.png)
 
 11. *How many customers downgraded from a pro monthly to a basic monthly plan in 2020?*
 
@@ -448,8 +415,11 @@ WHERE plan_id = 1 AND prev_plan = 2 AND strftime('%Y', start_date) = '2020'
 ```
 
 **Result:**
+
 No rows, so not a single customer downgraded from pro monthly to basic monthly in 2020.
+
 **Learned:**
+
 **lag()** window function, the opposite of lead().
 
 ### C. Challenge Payment Question
@@ -658,6 +628,7 @@ FROM unupdated_payment_table
 | 7                | 2            | pro monthly    | 2020-12-22        | 19.90      | 12                 |
 
 **Note:**
+
 The above query assumes that every pro monthly to pro annual upgrade happens on the correct date in the dataset. The following query checks all the instances for which this upgrade does not happen on the same day as the billing date:
 
 ```sql
@@ -720,12 +691,15 @@ We can see that in all of these instances, the pro monthly to pro annual upgrade
 1. *How would you calculate the rate of growth for Foodie-Fi?*
 
 **Answer:**
+
 Using the payment table from question C, we can calculate Foodie-Fi’s total revenue over some time period (years, seasons, months etc.). We can compare this revenue to the revenue from a previous period and get a percentage growth factor as:
-&#x9;newrevenue - oldrevenueoldrevenue  100%
+
+$\frac{\text{newrevenue} - \text{oldrevenue}}{\text{oldrevenue}} * 100%$
 
 2. *What key metrics would you recommend Foodie-Fi management to track over time to assess performance of their overall business?*
 
 **Answer:**
+
 I recommend tracking the following:
 
 - Rate at which new customers come in to try out a trial subscription.
@@ -741,7 +715,9 @@ I recommend tracking the following:
 3. *What are some key customer journeys or experiences that you would analyse further to improve customer retention?*
 
 **Answer:**
+
 How many videos they watch, what kind, how long they watch them for and when.
+
 This tells you if the customer is losing interest in the material from your streaming service and if you need a larger quality/variety of content.
 
 4. *If the Foodie-Fi team were to create an exit survey shown to customers who wish to cancel their subscription, what questions would you include in the survey?*
@@ -763,6 +739,7 @@ This tells you if the customer is losing interest in the material from your stre
 5. *What business levers could the Foodie-Fi team use to reduce the customer churn rate? How would you validate the effectiveness of your ideas?*
 
 **Answer:**
+
 Consider the query:
 
 ```sql
