@@ -454,30 +454,6 @@ GROUP BY pizza_name
 **Query:**
 
 ```sql
-SELECT customer_id, pizza_name, COUNT(*) AS amount_ordered
-FROM customer_orders
-JOIN pizza_names USING (pizza_id)
-GROUP BY customer_id, pizza_name
-```
-
-**Result:**
-
-| **customer_id** | **pizza_name** | **amount_ordered** |
-| --------------- | -------------- | ------------------ |
-| 101             | Meatlovers     | 2                  |
-| 101             | Vegetarian     | 1                  |
-| 102             | Meatlovers     | 2                  |
-| 102             | Vegetarian     | 1                  |
-| 103             | Meatlovers     | 3                  |
-| 103             | Vegetarian     | 1                  |
-| 104             | Meatlovers     | 3                  |
-| 105             | Vegetarian     | 1                  |
-
-**Note:**
-
-While this table gives the required information, it’s not as readable as I’d like it to be (though it does automate to an arbitrary amount of pizza names). So since we only have two types of pizza’s, we construct a new query with the previous query as a base:
-
-```sql
 WITH order_type AS(
     SELECT customer_id, pizza_name, COUNT(*) AS amount_ordered
     FROM customer_orders
@@ -499,7 +475,7 @@ GROUP BY customer_id
 | 104             | 3                      | 0                       |
 | 105             | 0                      | 1                       |
 
-**Note 2:**
+**Note:**
 
 At the beginning I tried to do
 
@@ -730,7 +706,7 @@ GROUP BY order_id
 | 8            | 1          | 1229                            |
 | 10           | 2          | 931                             |
 
-Diagram
+![](images/pizza_amnt_vs_avg_prep_time.png)
 
 **Answer:**
 
@@ -803,9 +779,10 @@ ORDER BY Runner
 | 2          | 8         | 93.6                     |
 | 3          | 5         | 40.0                     |
 
-***Diagram***
 
-***Diagram***
+![](images/avg_speed_orders.png)
+
+![](images/avg_runner_speed.png)
 
 **Answer:**
 
