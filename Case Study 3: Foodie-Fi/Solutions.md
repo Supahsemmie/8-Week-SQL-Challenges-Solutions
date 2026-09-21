@@ -202,8 +202,7 @@ GROUP BY next_plan
 
 **Learned:**
 
-- Window function **lead()** to find the next row value of a column
-- At first I had calculated each row here separately and joined the rows using UNION ALL before I realized I could just GROUP BY “next\_plan” to perform the calculations in the same SELECT statement
+- Window function **lead()** to find the next row value of a column.
 
 7. *What is the customer count and percentage breakdown of all 5* *`plan_name`* *values at* *`2020-12-31`**?*
 
