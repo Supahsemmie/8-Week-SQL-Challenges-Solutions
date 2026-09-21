@@ -6,6 +6,9 @@ Queries written in (DB browser for) SQlite.
 
 # Data cleaning
 
+<details>
+<summary> Click to expand answer! </summary>
+
 The “customer_orders” and “runner_orders” tables have a lot of different ways to denote empty cells, and we would first like to homogenize the columns so that querying will be easier later on. The “runner_orders” table also has some incorrect dates (pickup times in the year 2020, when the runners themselves register in 2021), as well as inconsistent distance and duration notations. We will also make these consistent by removing the letters and only keeping the amount of kilometers or the amount of minutes.
 
 **Current customer_orders table:**
@@ -372,9 +375,11 @@ WHERE topping_id IS NOT NULL;
 
 * **Recursion** in SQL using CTEs.
 
-  * Base case, UNION ALL with recursive step, ending recursion in the recursive step with a WHERE statement.
+* Base case, UNION ALL with recursive step, ending recursion in the recursive step with a WHERE statement.
 * Usage of **substr()** to find a part of a string.
 * Usage of **instr()** to find the position of some part of a string.
+
+</details>
 
 # Case study questions and answers
 
