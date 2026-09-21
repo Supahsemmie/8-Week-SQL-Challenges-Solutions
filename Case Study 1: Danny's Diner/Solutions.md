@@ -366,11 +366,3 @@ FROM join_all
 **Learned:**
 
 **Window function RANK** usage, and having to choose between a CTE or repeating the condition for membership because in “join_all” I cannot call “member” in the same SELECT statement that member is instantiated. Nesting the same logic again in a single SELECT statement seemed hard to read.
-
-At first I tried to write a ranking table that I would then join back later on the join_all table. But because of these duplicate rows in both tables
-
-| A | 2021-01-11 | ramen | 12 | Y | 3 |
-| - | ---------- | ----- | -- | - | - |
-| A | 2021-01-11 | ramen | 12 | Y | 3 |
-
-joining them at the end would lead to 2 x 2 = 4 rows. I couldn’t just group these rows at the end, since the final result required both of these rows to stay intact.
