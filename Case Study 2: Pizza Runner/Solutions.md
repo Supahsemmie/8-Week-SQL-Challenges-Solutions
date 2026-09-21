@@ -249,18 +249,18 @@ FROM customer_orders
 ```sql
 CREATE TABLE IF NOT EXISTS "customer_orders_exclusions"(
     "order_item_id" INTEGER,
-    "topping_id" INTEGER,
-    PRIMARY KEY ("order_item_id", "topping_id"),
+    "exclusion_id" INTEGER,
+    PRIMARY KEY ("order_item_id", "exclusion_id"),
     FOREIGN KEY("order_item_id") REFERENCES "customer_orders_cleaned"("order_item_id"),
-    FOREIGN KEY("topping_id") REFERENCES "pizza_toppings"("topping_id")
+    FOREIGN KEY("exclusion_id") REFERENCES "pizza_toppings"("topping_id")
 );
 
 CREATE TABLE IF NOT EXISTS "customer_orders_extras"(
     "order_item_id" INTEGER,
-    "topping_id" INTEGER,
-    PRIMARY KEY ("order_item_id", "topping_id"),
+    "extra_id" INTEGER,
+    PRIMARY KEY ("order_item_id", "extra_id"),
     FOREIGN KEY("order_item_id") REFERENCES "customer_orders_cleaned"("order_item_id"),
-    FOREIGN KEY("topping_id") REFERENCES "pizza_toppings"("topping_id")
+    FOREIGN KEY("extra_id") REFERENCES "pizza_toppings"("topping_id")
 );
 
 WITH RECURSIVE string_split_exclusions AS (
@@ -273,7 +273,7 @@ WITH RECURSIVE string_split_exclusions AS (
                 CAST(
                     substr(exclusions, 1, instr(exclusions, ',') - 1) 
                 AS INTEGER)
-        END AS topping_id,
+        END AS exclusion_id,
         CASE
             WHEN instr(exclusions, ',') = 0 THEN NULL 
             ELSE substr(exclusions, instr(exclusions, ',') + 1) 
@@ -291,7 +291,7 @@ WITH RECURSIVE string_split_exclusions AS (
                 CAST(
                     substr(remainingexc, 1, instr(remainingexc, ',') - 1)
                 AS INTEGER)
-        END AS topping_id,
+        END AS exclusion_id,
         CASE 
             WHEN instr(remainingexc, ',') = 0 THEN NULL
             ELSE substr(remainingexc, instr(remainingexc, ',') + 1) 
@@ -299,10 +299,10 @@ WITH RECURSIVE string_split_exclusions AS (
     FROM string_split_exclusions 
     WHERE remainingexc IS NOT NULL 
 )
-INSERT INTO customer_orders_exclusions (order_item_id, topping_id)
-SELECT order_item_id, topping_id
+INSERT INTO customer_orders_exclusions (order_item_id, exclusion_id)
+SELECT order_item_id, exclusion_id
 FROM string_split_exclusions
-WHERE topping_id IS NOT NULL;
+WHERE exclusion_id IS NOT NULL;
 
 
 WITH RECURSIVE string_split_extras AS (
@@ -315,7 +315,7 @@ WITH RECURSIVE string_split_extras AS (
                 CAST(
                     substr(extras, 1, instr(extras, ',') - 1) 
                 AS INTEGER)
-        END AS topping_id,
+        END AS extra_id,
         CASE
             WHEN instr(extras, ',') = 0 THEN NULL 
             ELSE substr(extras, instr(extras, ',') + 1) 
@@ -333,7 +333,7 @@ WITH RECURSIVE string_split_extras AS (
                 CAST(
                     substr(remainingextra, 1, instr(remainingextra, ',') - 1)
                 AS INTEGER)
-        END AS topping_id,
+        END AS extra_id,
         CASE 
             WHEN instr(remainingextra, ',') = 0 THEN NULL
             ELSE substr(remainingextra, instr(remainingextra, ',') + 1) 
@@ -341,17 +341,17 @@ WITH RECURSIVE string_split_extras AS (
         FROM string_split_extras
         WHERE remainingextra IS NOT NULL 
 )
-INSERT INTO customer_orders_extras (order_item_id, topping_id)
-SELECT order_item_id, topping_id
+INSERT INTO customer_orders_extras (order_item_id, extra_id)
+SELECT order_item_id, extra_id
 FROM string_split_extras
-WHERE topping_id IS NOT NULL;
+WHERE extra_id IS NOT NULL;
 ```
 
 **Result:**
 
 **“Customer_orders_exclusions”:**
 
-| **order_item_id** | **topping_id** |
+| **order_item_id** | **exclusion_id** |
 | ----------------- | -------------- |
 | 5                 | 4              |
 | 6                 | 4              |
@@ -362,7 +362,7 @@ WHERE topping_id IS NOT NULL;
 
 **“Customer_orders_extras”:**
 
-| **order_item_id** | **topping_id** |
+| **order_item_id** | **extra_id** |
 | ----------------- | -------------- |
 | 8                 | 1              |
 | 10                | 1              |
@@ -459,47 +459,10 @@ GROUP BY pizza_name
 **Query:**
 
 ```sql
-WITH order_type AS(
-    SELECT customer_id, pizza_name, COUNT(*) AS amount_ordered
-    FROM customer_orders
-    JOIN pizza_names USING (pizza_id)
-    GROUP BY customer_id, pizza_name
-)
-SELECT customer_id, SUM(CASE WHEN pizza_name = "Meatlovers" THEN amount_ordered ELSE 0 END) AS meatlovers_ordered, SUM(CASE WHEN pizza_name = "Vegetarian" THEN amount_ordered ELSE 0 END) AS vegetarians_ordered
-FROM order_type
-GROUP BY customer_id
-```
-
-**Result:**
-
-| **customer_id** | **meatlovers_ordered** | **vegetarians_ordered** |
-| --------------- | ---------------------- | ----------------------- |
-| 101             | 2                      | 1                       |
-| 102             | 2                      | 1                       |
-| 103             | 3                      | 1                       |
-| 104             | 3                      | 0                       |
-| 105             | 0                      | 1                       |
-
-**Note:**
-
-At the beginning I tried to do
-
-```sql
-SELECT . . ., COUNT(CASE WHEN pizza_name = "Meatlovers" THEN 1 ELSE 0 END) AS meatlovers_ordered, . . .
-```
-
-However, this still leads to the query counting rows other than “Meatlovers”. I now learned that removing the “ELSE 0” part in the query above changes the behaviour so that it now only counts the rows with pizza_names “Meatlovers”.
-
-**Future note:**
-
-I came across something similar in Challenge 8 question 1.4, and now the behaviour here is more clear to me:
-
-The CASE statement returns rows based on some condition(s). The COUNT function then counts all non-NULL rows that are returned by the CASE statement. In the above line of SQL code, the CASE statement *always* returns a row (either 1 or 0), and so the COUNT function just counts every single row. The reason we omit the “ELSE 0” part is that now any non-meatlovers pizzas simply get NULL values and then they will not be counted by the COUNT function, which is the behaviour we want.
-
-The simplified query now becomes:
-
-```sql
-SELECT customer_id, COUNT(CASE WHEN pizza_name = "Meatlovers" THEN 1 END) AS meatlovers_ordered, COUNT(CASE WHEN pizza_name = "Vegetarian" THEN 1 END) AS vegetarians_ordered
+SELECT
+    customer_id,
+    COUNT(CASE WHEN pizza_name = "Meatlovers" THEN 1 END) AS meatlovers_ordered,
+    COUNT(CASE WHEN pizza_name = "Vegetarian" THEN 1 END) AS vegetarians_ordered
 FROM customer_orders
 JOIN pizza_names USING (pizza_id)
 GROUP BY customer_id
@@ -848,56 +811,20 @@ Usage of the aggregate function **group_concat** to combine the topping names in
 **Query:**
 
 ```sql
-WITH RECURSIVE clean_extras AS (
-    --Base case
-    SELECT
-        order_id,
-        CASE 
-            WHEN instr(extras, ',') = 0 THEN CAST(extras AS INTEGER) --Check if we have more than one number in the list
-            ELSE 
-                CAST(
-                    substr(extras, 1, instr(extras, ',') - 1) --Take the first digits before the first comma
-                AS INTEGER) --The remaining number is a string, so we cast it into an integer to order by it later and remove spaces
-            END AS extra,
-        CASE
-            WHEN instr(extras, ',') = 0 THEN NULL --Nothing remains
-            ELSE substr(extras, instr(extras, ',') + 1) --Let everything after the comma remain for the next recursive loop
-        END AS remaining
-    FROM customer_orders
-    
-    --Recursive step
-    UNION ALL
-    
-    SELECT 
-        order_id,
-        CASE 
-            WHEN instr(remaining, ',') = 0 THEN CAST(remaining AS INTEGER) --Same as base case, but continuing from “remaining”
-            ELSE 
-                CAST(
-                    substr(remaining, 1, instr(remaining, ',') - 1) 
-                AS INTEGER)
-        END AS extra,
-        CASE 
-            WHEN instr(remaining, ',') = 0 THEN NULL
-            ELSE substr(remaining, instr(remaining, ',') + 1) 
-        END AS remaining
-    FROM clean_extras --Recursion, calling itself
-    WHERE remaining IS NOT NULL --Ends recursion
-),
 --Find counts of each extra and rank them
-counts AS (
+WITH counts AS (
     SELECT 
-        extra, 
-        COUNT(*) AS times_added, --Count how many times each extra was added
+        extra_id, 
+        COUNT(*) AS times_added, --Count how many times a topping was added
         RANK() OVER(ORDER BY COUNT(*) DESC) AS ranking --Number 1 should have the highest count
-    FROM clean_extras
-    WHERE extra IS NOT NULL
-    GROUP BY extra
+    FROM customer_orders_extras
+    WHERE extra_id IS NOT NULL
+    GROUP BY extra_id
 )
 SELECT topping_name AS "Most commonly added extra"
 FROM counts 
-JOIN pizza_toppings ON extra = topping_id
-WHERE ranking = 1 --Choose the highest ranking (the extra that was added the most)
+JOIN pizza_toppings ON topping_id = extra_id
+WHERE ranking = 1
 ```
 
 **Result:**
@@ -906,13 +833,6 @@ WHERE ranking = 1 --Choose the highest ranking (the extra that was added the mos
 | ----------------------------- |
 | Bacon                         |
 
-**Note:**
-
-The entire recursive CTE is reused here. We cannot just clean the original table because spreading out e.g. extras 2,6 to a row with extras 2 and a row with extras 6 changes the “customer_orders” table and makes it seem like 2 pizzas were ordered rather than 1 pizza with 2 extras.
-
-**Future note:**
-
-Now that we have “customer_orders_exclusions” and “customer_orders_extras”, questions like above can be answered much quicker and without repeating the recursion, as we can see below.
 
 3. *What was the most common exclusion?*
 
@@ -922,22 +842,23 @@ Now that we have “customer_orders_exclusions” and “customer_orders_extras�
 --Find counts of each exclusion and rank them
 WITH counts AS (
     SELECT 
-        topping_id, 
+        exclusion_id, 
         COUNT(*) AS times_added, --Count how many times a topping was excluded
         RANK() OVER(ORDER BY COUNT(*) DESC) AS ranking --Number 1 should have the highest count
     FROM customer_orders_exclusions
-    WHERE topping_id IS NOT NULL
-    GROUP BY topping_id
+    WHERE exclusion_id IS NOT NULL
+    GROUP BY exclusion_id
 )
-SELECT topping_name AS "Most commonly added extra"
+SELECT topping_name AS "Most common exclusion"
 FROM counts 
-JOIN pizza_toppings USING (topping_id)
+JOIN pizza_toppings ON topping_id = exclusion_id
 WHERE ranking = 1
+
 ```
 
 **Result:**
 
-| **Most commonly added extra** |
+| **Most common exclusion** |
 | ----------------------------- |
 | Cheese                        |
 
@@ -964,31 +885,31 @@ WHERE ranking = 1
 ```sql
 --Determine the exclusions string
 WITH exclusions_order_item AS (
-    SELECT 
-    order_item_id,
-        CASE
-            WHEN exclusions IS NOT NULL THEN concat(pizza_name, ' - Exclude ', group_concat(topping_name, ', '))
-            ELSE pizza_name
-        END AS order_item_exc
-    FROM customer_orders_cleaned
-    JOIN pizza_names USING (pizza_id)
-    LEFT JOIN customer_orders_exclusions USING (order_item_id) --Left join since the exclusions/extras tables only consider pizzas
-    LEFT JOIN pizza_toppings USING (topping_id)                --with exclusions/extras but we need to keep the other rows/pizzas too
-    GROUP BY order_item_id
+	SELECT 
+	order_item_id,
+		CASE
+			WHEN exclusions IS NOT NULL THEN concat(pizza_name, ' - Exclude ', group_concat(topping_name, ', '))
+			ELSE pizza_name
+		END AS order_item_exc
+	FROM customer_orders_cleaned
+	JOIN pizza_names USING (pizza_id)
+	LEFT JOIN customer_orders_exclusions USING (order_item_id) --Left join since the exclusions/extras tables only consider pizzas
+	LEFT JOIN pizza_toppings ON topping_id = exclusion_id	   --with exclusions/extras but we need to keep the other rows/pizzas too
+	GROUP BY order_item_id
 )
 --Determine the extras string and concatenate this after the exclusions string when applicable
 SELECT 
-    order_item_id,
-    CASE
-        WHEN exclusions IS NULL AND extras IS NOT NULL THEN concat(pizza_name, ' - Extra ', group_concat(topping_name, ', '))
-        WHEN exclusions IS NOT NULL AND extras IS NULL THEN order_item_exc
-        WHEN exclusions IS NOT NULL AND extras IS NOT NULL THEN concat(order_item_exc, ' - Extra ', group_concat(topping_name, ', '))
-        ELSE pizza_name
-    END AS order_item
+	order_item_id,
+	CASE
+		WHEN exclusions IS NULL AND extras IS NOT NULL THEN concat(pizza_name, ' - Extra ', group_concat(topping_name, ', '))
+		WHEN exclusions IS NOT NULL AND extras IS NULL THEN order_item_exc
+		WHEN exclusions IS NOT NULL AND extras IS NOT NULL THEN concat(order_item_exc, ' - Extra ', group_concat(topping_name, ', '))
+		ELSE pizza_name
+	END AS order_item
 FROM customer_orders_cleaned
 JOIN pizza_names USING (pizza_id)
 LEFT JOIN customer_orders_extras USING (order_item_id) 
-LEFT JOIN pizza_toppings USING (topping_id)
+LEFT JOIN pizza_toppings ON topping_id = extra_id
 JOIN exclusions_order_item USING (order_item_id)
 GROUP BY order_item_id
 ```
@@ -1079,10 +1000,6 @@ GROUP BY order_item_id
 
 * Usage of **(NOT) EXISTS** to compare rows in one table to rows from another table.
 * Usage of **UNION ALL** to add rows from another table (earlier I only added from the same table with recursion)
-
-**Note:**
-
-In this exercise I noticed the inconvenience of the columns in the exclusions/extras table being called “topping_id”, so I changed them from here on out to “exclusion_id” and “extra_id” respectively.
 
 6. *What is the total quantity of each ingredient used in all delivered pizzas sorted by most frequent first?*
 
