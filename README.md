@@ -20,7 +20,7 @@ If you want to give the challenges a shot yourself, below is a list with links t
 
 # Learning process
 
-Before I started working on these case studies, most of my SQL/Relational DB knowledge consisted of the basics (simple filtering, ordering, joins, groups, subqueries etc.) which I had learned from the [SQBolt Tutorials](https://sqlbolt.com/) (which is an excellent beginner source, by the way!).
+Before I started working on these case studies, most of my SQL/Relational DB knowledge consisted of the basics (simple filtering, ordering, joins, groups, aggregate functions, subqueries etc.) which I had learned from the [SQBolt Tutorials](https://sqlbolt.com/) (which is an excellent beginner source, by the way!).
 
 I've used these 8 challenges as a next step to practicing my SQL and business interpretation and reasoning. While working on the problems I've kept track of several key mistakes, learning moments and problem observations that I've had. 
 
