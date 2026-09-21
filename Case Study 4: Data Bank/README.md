@@ -81,3 +81,9 @@ This table stores all customer deposits, withdrawals and purchases made using th
 ## Entity Relationship Diagram
 
 ![](images/ERD.png)
+
+**Note:**
+
+* The entity relationship diagram denotes `customer_id` from `customer_nodes` as a primary key, however the table has multiple rows of values for the same `customer_id`, so in the schema creation I’ve chosen a primary key that is the unique combination of (`customer_id`, `start_date`) of when they are linked to any node.  
+  * This however breaks the foreign key in `customer_transactions` that links the `customer_id` there to the `customer_id` from `customer_nodes`. So I have chosen not to add that one. Since we will not be adding data to the dataset ourselves, for this challenge this will not be an issue.  
+    * If we really wanted to fix this, then we need to add a true primary key to `customer_nodes`, something akin to `node_match_id`.
