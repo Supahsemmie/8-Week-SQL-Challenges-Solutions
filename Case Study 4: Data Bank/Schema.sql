@@ -4,26 +4,28 @@
    ================================ */ 
 
 CREATE TABLE regions (
-  region_id INTEGER,
-  region_name VARCHAR(9)
+    region_id INT,
+    region_name TEXT,
+    PRIMARY KEY (region_id)
 );
 
-INSERT INTO regions
-  (region_id, region_name)
+INSERT INTO regions 
+    (region_id, region_name)
 VALUES
-  ('1', 'Australia'),
-  ('2', 'America'),
-  ('3', 'Africa'),
-  ('4', 'Asia'),
-  ('5', 'Europe');
-
-
+    (1, 'Africa'),
+    (2, 'America'),
+    (3, 'Asia'),
+    (4, 'Europe'),
+    (5, 'Oceania');
+    
 CREATE TABLE customer_nodes (
-  customer_id INTEGER,
-  region_id INTEGER,
-  node_id INTEGER,
-  start_date DATE,
-  end_date DATE
+    customer_id INT,
+    region_id INT,
+    node_id INT,
+    start_date TEXT,
+    end_date TEXT,
+    PRIMARY KEY (customer_id, start_date)
+    FOREIGN KEY (region_id) REFERENCES regions (region_id)
 );
 
 INSERT INTO customer_nodes
