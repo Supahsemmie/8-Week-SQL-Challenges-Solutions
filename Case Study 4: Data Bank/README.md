@@ -2,7 +2,7 @@
 
 ## Source
 
-https://8weeksqlchallenge.com/case-study-14/
+https://8weeksqlchallenge.com/case-study-4/
 
 ## SQL concepts learned
 
