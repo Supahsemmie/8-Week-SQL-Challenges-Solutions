@@ -26,7 +26,7 @@ He plans on using these insights to help him decide whether he should expand the
 
 ## Datasets
 
-This case study contains 3 key datasets.
+This case study contains 3 tables.
 
 ### **Table 1: sales**
 
