@@ -4,6 +4,14 @@
 
 https://8weeksqlchallenge.com/case-study-1/
 
+## SQL concepts learned
+
+* Joining back information on some kind of metric (in this case a minimal order date).
+* Grouping by multiple columns at the same time to get all the rows in a table where the combinations of those columns are different.
+* Working with CTEs (Common Table Expressions) to create readable pipelines for the code rather than making one big SELECT statement.
+* Using CASE WHEN statements as an analogue to IF-THEN programming logic.
+* First taste of window functions and the RANK function.
+
 ## Introduction
 
 Danny seriously loves Japanese food so in the beginning of 2021, he decides to embark upon a risky venture and opens up a cute little restaurant that sells his 3 favourite foods: sushi, curry and ramen.
@@ -61,4 +69,6 @@ The final `members` table captures the `join_date` when a `customer_id` joined t
 | A | 2021-01-07 |
 | B | 2021-01-09 |
 
+## Entity Relationship Diagram
 
+![](images/ERD.png)
