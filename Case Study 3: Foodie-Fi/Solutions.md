@@ -253,7 +253,7 @@ GROUP BY plan_name
 
 **Note:**
 
-Since “start\_date” cannot track more precisely than the day of the subscription, we won't be able to tell what the current plan of a customer is if they change their subscription on the same day. In those cases, “row\_number” will arbitrarily choose one plan.
+Since `start_date` cannot track more precisely than the day of the subscription, we won't be able to tell what the current plan of a customer is if they change their subscription on the same day. In those cases, `row_number` will arbitrarily choose one plan.
 
 The following query counts the occurrences of more than 1 subscription change in a day: 
 
