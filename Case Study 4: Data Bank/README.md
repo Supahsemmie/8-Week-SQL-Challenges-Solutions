@@ -6,7 +6,9 @@ https://8weeksqlchallenge.com/case-study-14/
 
 ## SQL concepts learned
 
-* 
+* Using SUM as a window function and controlling which rows to sum with ```ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW```.
+* Creating **views** of query results to build other queries from later.
+* Better overall code formatting.
 
 ## Introduction
 
