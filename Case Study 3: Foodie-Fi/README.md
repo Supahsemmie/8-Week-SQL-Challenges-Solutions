@@ -4,10 +4,13 @@
 
 https://8weeksqlchallenge.com/case-study-3/
 
-## SQL concepts learned
+## (SQL) Lessons Learned
 
-* Window function lead() to find the next row value of a column.
-* Window function lag() to find the previous row value of a column.
+* Basic data structure of a subscription based service.
+* Window function `lead()` to find the next row value of a column.
+* Window function `lag()` to find the previous row value of a column.
+* Writing and managing bigger queries.
+* More open ended analysis and outside the box thinking.
 
 ## Introduction
 
