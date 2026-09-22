@@ -10,7 +10,7 @@ Queries written in (DB browser for) SQlite. 
 
 ### A. Customer Journey
 
-*Based off the 8 sample customers provided in the sample from the* *`subscriptions`* *table, write a brief description about each customer’s onboarding journey.*
+*Based off the 8 sample customers provided in the sample from the `subscriptions` table, write a brief description about each customer’s onboarding journey.*
 *Try to keep it as short as possible - you may also want to run some sort of join to make your explanations a bit easier!*
 
 **Query:**
@@ -95,7 +95,7 @@ GROUP BY date(start_date, 'start of month')
 **Note:**
 
 - Months were renamed manually in Google Sheets for readability.
-- The reason we need to sort by “start of month” rather than just “month”, is that there are also “start\_dates” in the dataset from the year 2021. 
+- The reason we need to sort by the start of the month rather than just the month, is that there are also `start\_dates` in the dataset from the year 2021. 
   - If we look at every trial plan in April, for example, then that would cover both April 2020 and April 2021, when we only want it to count for a single month in time.
     - It turns out no trials were started outside of 2020, but there are changes to customer subscriptions in 2021 so it is still good to be aware of this.
 
@@ -202,9 +202,9 @@ GROUP BY next_plan
 
 **Learned:**
 
-- Window function **lead()** to find the next row value of a column.
+- Window function `lead()` to find the next row value of a column.
 
-7. *What is the customer count and percentage breakdown of all 5* *`plan_name`* *values at* *`2020-12-31`**?*
+7. *What is the customer count and percentage breakdown of all 5* *`plan_name`* *values at* *`2020-12-31`?*
 
 **Query:**
 
@@ -337,7 +337,7 @@ If there were any duplicates, we would have to rewrite our query to find the **m
 
 **Answer:**
 
-The idea  is to take “time\_to\_annual” and divide it by 30, then take the ceiling (rounded up) of that value. For example any number (except 0) between 0 and 30 divided by 30 will round up to 1, and any number between 31 and 60 divided by 30 will round up to 2 etc. Once we have all the “time\_to\_annual” values grouped like this, we can directly count them.
+The idea  is to take `time_to_annual` and divide it by 30, then take the ceiling (rounded up) of that value. For example any number (except 0) between 0 and 30 divided by 30 will round up to 1, and any number between 31 and 60 divided by 30 will round up to 2 etc. Once we have all the `time_to_annual` values grouped like this, we can directly count them.
 
 **Query:**
 
@@ -419,7 +419,7 @@ No rows, so not a single customer downgraded from pro monthly to basic monthly i
 
 **Learned:**
 
-**lag()** window function, the opposite of lead().
+`lag()` window function, the opposite of `lead()`.
 
 ### C. Challenge Payment Question
 
@@ -664,7 +664,7 @@ WHERE date_check = 0
 | 873              | 2            | 2020-03-31      | 0               |
 | 960              | 2            | 2020-10-29      | 0               |
 
-If we look at these 3 cases in the “subscriptions” table, then we find this:
+If we look at these 3 cases in the `subscriptions` table, then we find this:
 
 
 
@@ -706,7 +706,7 @@ I recommend tracking the following:
   - Pro monthly to pro annual is a discount for the customer but guarantees the money for a year up front, so these two are about equally valuable.
 - Churn rate, the main revenue loss condition.
 
-&#x9;Less important but still interesting:
+Less important but still interesting:
 
 - Average time until basic upgrades to something else.
 - Average time until churn.
@@ -775,7 +775,7 @@ Combine this with the result from question B7 for plan occurrences at the end of
 
 This shows that pro annual customers are the most loyal, and that a large number of customers churn after a trial (not even getting on board). 
 
-Other than increasing the service quality overall, one way to improve the onboarding rate would be to make basic monthly a more appealing subscription. I would do this by giving more access to videos (this should probably be the case for a paid subscription). 
+Other than increasing the service quality overall, one way to improve the onboarding rate would be to make basic monthly a more appealing subscription. I would do this by giving more access to videos. 
 
 This way, once the customers are at least on board, they are statistically more likely to stay and possibly upgrade later to a pro subscription.
 
