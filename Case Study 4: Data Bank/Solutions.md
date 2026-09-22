@@ -973,7 +973,7 @@ GROUP BY "Date"
 
 **Graph:**
 
-![][image1]
+![](images/real_time_total_balance.png)
 
 Taking the maximum per month, we can calculate the maximum data allocation capacity that Data Bank will have to provide per month.
 
@@ -1280,5 +1280,5 @@ GROUP BY "Month"
 
 2. *With the transaction analysis \- prepare a 1 page presentation slide which contains all the relevant information about the various options for the data provisioning so the Data Bank management team can make an informed decision.*
 
-![](images/data_provisioning_slide.jpg)
+![](images/data_provisioning_slide.png)
 
