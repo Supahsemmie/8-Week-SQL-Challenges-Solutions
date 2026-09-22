@@ -361,4 +361,4 @@ FROM join_all
 
 **Learned:**
 
-**Window function `RANK()`** usage, and having to choose between a CTE or repeating the condition for membership because in `join_all` I cannot call `member` in the same `SELECT` statement that member is instantiated. Nesting the same logic again in a single `SELECT` statement seemed hard to read.
+**Window function** `RANK()` usage, and having to choose between a CTE or repeating the condition for membership because in `join_all` I cannot call `member` in the same `SELECT` statement that member is instantiated. Nesting the same logic again in a single `SELECT` statement seemed hard to read.
