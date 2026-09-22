@@ -8,10 +8,10 @@ https://8weeksqlchallenge.com/case-study-1/
 
 * Basic data structure of a (small) restaurant.
 * Joining back information on some kind of metric (in this case a minimal order date).
-* Grouping by multiple columns at the same time to get all the rows in a table where the combinations of those columns are different.
-* Working with CTEs (Common Table Expressions) to create readable pipelines for the code rather than making one big SELECT statement.
-* Using CASE WHEN statements as an analogue to IF-THEN programming logic.
-* First taste of window functions via use of the RANK function.
+* Using `GROUP BY` on multiple columns at the same time to get all the rows in a table where the combinations of those columns are different.
+* Working with CTEs (Common Table Expressions) to create readable pipelines for the code rather than making one big `SELECT` statement.
+* Using `CASE WHEN` statements as an analogue to `IF-THEN` programming logic.
+* First taste of window functions via use of the `RANK()` function.
 
 ## Introduction
 
