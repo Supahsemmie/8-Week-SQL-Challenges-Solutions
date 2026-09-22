@@ -4,7 +4,7 @@
 
 https://8weeksqlchallenge.com/case-study-1/
 
-## (SQL) Concepts learned
+## (SQL) Lessons Learned
 
 * Basic data structure of a (small) restaurant.
 * Joining back information on some kind of metric (in this case a minimal order date).
