@@ -182,6 +182,7 @@ FROM clean_week_dates
 | 2020-08-31    | 36              | 8                | 2020              | AFRICA     | Retail       | C3          | Retirees     | Couples         | New               | 111032           | 3888162   | 35.02               |
 
 **Note:**
+
 Since SQlite does not support automatically converting the date formats, I’ve taken this as an exercise in string manipulation. The logic for that is written in “day_week_year” and then concatenated in “clean_week_dates”. These CTEs also contain a lot of the other columns so I can pass those through later rather than having to write a join statement (and needing to create some kind of identifiers to link to).
 
 ### 2. Data Exploration
@@ -246,6 +247,7 @@ FROM min_and_max
 | 1-12, 37-52              |
 
 **Note:**
+
 After taking a look at the result from “present_week_numbers”, I could see that there were no gaps from weeks 12 to 36. Hence, I know that all the missing weeks are the weeks before and after that. 
 If there were gaps, one could generate a CTE which has all week numbers, and then use a NOT EXISTS statement to find the missing week numbers.
 After that we can concatenate all missing week numbers, and maybe group some together in a range (e.g. 2-6) if necessary. Since the numbers are simple in this exercise, I’ve chosen to go with the simpler query at the cost of some scalability.
@@ -270,39 +272,6 @@ GROUP BY calendar_year
 
 4. *What is the total sales for each region for each month?*
 
-**Query:**
-
-```sql
-SELECT 
-    region AS "Region",
-    month_number AS "Month number",
-    SUM(sales) AS "Total sales"
-FROM clean_weekly_sales
-GROUP BY region, month_number
-```
-
-**Result (first 2 regions):**
-
-| **Region** | **Month number** | **Total sales** |
-| ---------- | ---------------- | --------------- |
-| AFRICA     | 3                | 567767480       |
-| AFRICA     | 4                | 1911783504      |
-| AFRICA     | 5                | 1647244738      |
-| AFRICA     | 6                | 1767559760      |
-| AFRICA     | 7                | 1960219710      |
-| AFRICA     | 8                | 1809596890      |
-| AFRICA     | 9                | 276320987       |
-| ASIA       | 3                | 529770793       |
-| ASIA       | 4                | 1804628707      |
-| ASIA       | 5                | 1526285399      |
-| ASIA       | 6                | 1619482889      |
-| ASIA       | 7                | 1768844756      |
-| ASIA       | 8                | 1663320609      |
-| ASIA       | 9                | 252836807       |
-
-**Note:**
-At first I assumed the question asked to sum sales over the months from all years at the same time. For example, month 3 is March 2018, March 2019 and March 2020 all together. 
-In hindsight, it seems more reasonable to group by years as well. We also use a YYYY-MM-DD format here so we can more easily import this into a spreadsheet for graphing.
 **Query:**
 
 ```sql
@@ -348,7 +317,9 @@ FROM total_sales
 | AFRICA     | 2020-08-01 | 706022238       |
 
 **Graph:**
-**Diagram**
+
+![](images/monthly_sales_per_region.png)
+
 **Note:**
 There is a noticeable dip in all sales in June 2020: exactly when the packaging change was introduced.
 What is also interesting is that the usual April dip in sales was very minor in 2020 compared to the other years. There was even a peak in June 2020 when in the other years there’s a valley during June.
@@ -372,87 +343,6 @@ GROUP BY platform
 
 6. *What is the percentage of sales for Retail vs Shopify for each month?*
 
-**Query:**
-
-```sql
-WITH platform_sales AS (
-    SELECT
-        platform,
-        calendar_year,
-        month_number,
-        SUM(sales) AS platform_sales
-    FROM clean_weekly_sales
-    GROUP BY platform, calendar_year, month_number
-),
-monthly_total_sales AS (
-    SELECT
-        calendar_year,
-        month_number, 
-        SUM(sales) AS total_sales
-    FROM clean_weekly_sales
-    GROUP BY calendar_year, month_number
-)
-SELECT
-    platform AS "Platform",
-    p.calendar_year,
-    month_number AS "Month",
-    ROUND(
-        100 * CAST(platform_sales AS REAL)/CAST(total_sales AS REAL),
-        1
-    )    AS "Sales percentage"
-FROM platform_sales AS p
-JOIN monthly_total_sales USING (calendar_year, month_number)
-GROUP BY platform, p.calendar_year, month_number
-ORDER BY p.calendar_year, month_number
-```
-
-**Result:**
-
-| **Platform** | **calendar_year** | **Month** | **Sales percentage** |
-| ------------ | ----------------- | --------- | -------------------- |
-| Retail       | 2018              | 3         | 97.9                 |
-| Shopify      | 2018              | 3         | 2.1                  |
-| Retail       | 2018              | 4         | 97.9                 |
-| Shopify      | 2018              | 4         | 2.1                  |
-| Retail       | 2018              | 5         | 97.7                 |
-| Shopify      | 2018              | 5         | 2.3                  |
-| Retail       | 2018              | 6         | 97.8                 |
-| Shopify      | 2018              | 6         | 2.2                  |
-| Retail       | 2018              | 7         | 97.8                 |
-| Shopify      | 2018              | 7         | 2.2                  |
-| Retail       | 2018              | 8         | 97.7                 |
-| Shopify      | 2018              | 8         | 2.3                  |
-| Retail       | 2018              | 9         | 97.7                 |
-| Shopify      | 2018              | 9         | 2.3                  |
-| Retail       | 2019              | 3         | 97.7                 |
-| Shopify      | 2019              | 3         | 2.3                  |
-| Retail       | 2019              | 4         | 97.8                 |
-| Shopify      | 2019              | 4         | 2.2                  |
-| Retail       | 2019              | 5         | 97.5                 |
-| Shopify      | 2019              | 5         | 2.5                  |
-| Retail       | 2019              | 6         | 97.4                 |
-| Shopify      | 2019              | 6         | 2.6                  |
-| Retail       | 2019              | 7         | 97.4                 |
-| Shopify      | 2019              | 7         | 2.6                  |
-| Retail       | 2019              | 8         | 97.2                 |
-| Shopify      | 2019              | 8         | 2.8                  |
-| Retail       | 2019              | 9         | 97.1                 |
-| Shopify      | 2019              | 9         | 2.9                  |
-| Retail       | 2020              | 3         | 97.3                 |
-| Shopify      | 2020              | 3         | 2.7                  |
-| Retail       | 2020              | 4         | 97.0                 |
-| Shopify      | 2020              | 4         | 3.0                  |
-| Retail       | 2020              | 5         | 96.7                 |
-| Shopify      | 2020              | 5         | 3.3                  |
-| Retail       | 2020              | 6         | 96.8                 |
-| Shopify      | 2020              | 6         | 3.2                  |
-| Retail       | 2020              | 7         | 96.7                 |
-| Shopify      | 2020              | 7         | 3.3                  |
-| Retail       | 2020              | 8         | 96.5                 |
-| Shopify      | 2020              | 8         | 3.5                  |
-
-**Note:**
-This result has redundant information: the shopify percentages can be deduced from the retail percentages. Let’s try to incorporate both percentages per month into the same column:
 **Query:**
 
 ```sql
@@ -560,65 +450,6 @@ GROUP BY calendar_year, demographic
 **Query:**
 
 ```sql
-WITH total_retail_sales AS (
-    SELECT SUM(sales) AS retail_sales
-    FROM clean_weekly_sales
-    WHERE platform = 'Retail'
-),
-age_band_percentages AS (
-    SELECT 
-        age_band,
-        ROUND(
-            100 * CAST(SUM(sales) AS REAL)/CAST(retail_sales AS REAL),
-            1
-        ) AS ab_percentage
-    FROM clean_weekly_sales
-    CROSS JOIN total_retail_sales
-    WHERE age_band != 'unknown'
-    GROUP BY age_band
-),
-demographic_percentages AS (
-    SELECT 
-        demographic,
-        ROUND(
-            100 * CAST(SUM(sales) AS REAL)/CAST(retail_sales AS REAL),
-            1
-        ) AS d_percentage
-    FROM clean_weekly_sales
-    CROSS JOIN total_retail_sales
-    WHERE demographic != 'unknown'
-    GROUP BY demographic
-),
-max_ab_percentages AS (
-    SELECT 
-        age_band,
-        MAX(ab_percentage) AS max_ab_percentage 
-    FROM age_band_percentages
-),
-max_d_percentages AS (
-    SELECT 
-        demographic,
-        MAX(d_percentage) AS max_d_percentage 
-    FROM demographic_percentages
-)
-SELECT 
-    age_band AS "Most contributing age_band",
-    demographic AS "Most contributing demographic"
-FROM max_ab_percentages
-CROSS JOIN max_d_percentages
-```
-
-**Result:**
-
-| **Most contributing age_band** | **Most contributing demographic** |
-| ------------------------------ | --------------------------------- |
-| Retirees                       | Families                          |
-
-**Note:**
-I realize now that the percentage calculation is unnecessary here: we are only interested in the highest sales counts (the most contributing factor). Hence, we can shorten the query:
-**Query:**
-
-```sql
 WITH best_age_band AS (
     SELECT 
         age_band,
@@ -655,10 +486,16 @@ CROSS JOIN best_demographic
 9. *Can we use the* *`avg_transaction`* *column to find the average transaction size for each year for Retail vs Shopify? If not - how would you calculate it instead?*
 
 **Answer:**
-The `avg_transaction `column calculates the averages over a week-long period. We cannot deduce the yearly averages from this metric without accounting for the amount of transactions that the weekly averages were individually taken over. You cannot just “average the averages” as you have lost crucial information during the first aggregation.
-For example, if one week has only 10 transactions with a sales value of 100 and another week has 10000 transactions with a sales value of 10000, then the first week has an average transaction value of 10, and the second week has an average of 1. The average of these averages is 5.5. Week 2 however had *so many more transactions*, that if we take the average of the two weeks combined, we get 10000 + 100/10000 + 10 ≈ 1.009…
+
+The `avg_transaction` column calculates the averages over a week-long period. We cannot deduce the yearly averages from this metric without accounting for the amount of transactions that the weekly averages were individually taken over. You cannot just “average the averages” as you have lost crucial information during the first aggregation.
+
+For example, if one week has only 10 transactions with a sales value of 100 and another week has 10000 transactions with a sales value of 10000, then the first week has an average transaction value of 10, and the second week has an average of 1. The average of these averages is 5.5. Week 2 however had *so many more transactions*, that if we take the average of the two weeks combined, we get
+
+$10000 + \frac{100}{10000} + 10 \approx 1.009…$
+
 The 10 transactions from week 1 are given too much weight if weeks 1 and 2 are weighted equally. 
 So, we first get the total sum of transactions and sales per year for Retail vs Shopify, and then divide to average out at the end.
+
 **Query:**
 
 ```sql
@@ -856,11 +693,11 @@ GROUP BY calendar_year
 ### 4. Bonus Question
 
 *Which areas of the business have the highest negative impact in sales metrics performance in 2020 for the 12 week before and after period?*
+
 **Answer:**
+
 We will perform the same 12 week before and after calculation, as before, but now grouping by any of the attributes of interest (region, platform etc.). We can read off the most negative value to see where Data Mart has suffered the most performance from the packaging change.
 Every query here is essentially the same, but with a different attribute to group by. The most negative value is left to read off from the table rather than calculated directly in order to keep a full overview for later analysis.
-
-
 
 - ### region
 
@@ -927,6 +764,7 @@ ORDER BY "Relative change" 
 | EUROPE        | 5152392             | 4.7                 |
 
 **Answer:**
+
 The most impacted groups here are Asia and Oceania.
 
 - ### platform
@@ -987,6 +825,7 @@ ORDER BY "Relative change"
 | Shopify      | 15758440            | 7.2                 |
 
 **Answer:**
+
 The most impacted group here is Retail.
 
 - ### age band
@@ -1049,6 +888,7 @@ ORDER BY "Relative change"
 | Young Adults | -7388560            | -0.9                |
 
 **Answer:**
+
 The most impacted group is the group of middle aged customers. The “unknown” age bands give us no tangible information, so we can discard it.
 
 - ### demographic
@@ -1110,6 +950,7 @@ ORDER BY "Relative change"
 | Couples         | -17612358           | -0.9                |
 
 **Answer:**
+
 The most impacted group here is the group of families. The “unknown” demographic gives us no tangible information, so we can discard it.
 
 - ### customer type
@@ -1171,9 +1012,13 @@ ORDER BY "Relative change"
 | New               | 8750245             | 1.0                 |
 
 **Answer:**
+
 The most impacted groups here are the group of Guests and the Existing customers. 
+
 **Note:**
-This time we do not discard the “Guest” customer types, because they do give tangible information: people who are not part of the Data Mart customer system have different sales than people who are. In contrast, “unknown” age bands and demographics don’t tell us anything at all.
+
+This time we do not discard the `Guest` customer types, because they do give tangible information: people who are not part of the Data Mart customer system have different sales than people who are. In contrast, `Unknown` age bands and demographics don’t tell us anything at all.
+
 One possible interpretation of the relative decrease in guest sales is that guests might be the least loyal, and therefore are quicker to go to other competitors when a new change like this happens.
 
 *Do you have any further recommendations for Danny’s team at Data Mart or any interesting insights based off this analysis?*
@@ -1190,7 +1035,7 @@ From the results above, the most impacted areas seem to be
 
 It is noteworthy that some areas saw an increase in sales: Europe, Shopify and new customers had more sales after the packaging change than before. However, from the graph in question 2.4:
 
-**Diagram** 
+![](images/monthly_sales_per_region.png)
 
 , question 2.6 and the smaller absolute changes in the tables above, we know that Europe and Shopify also contribute very little to the overall sales of Data Mart.
 
