@@ -34,7 +34,7 @@ GROUP BY customer_id
 **Query:**
 
 ```sql
-SELECT customer_id, COUNT( DISTINCT order_date) AS days_visited
+SELECT customer_id, COUNT(DISTINCT order_date) AS days_visited
 FROM sales
 GROUP BY customer_id
 ```
@@ -75,7 +75,7 @@ AND sales.order_date = first_orders.first_order_date
 
 **Learned:**
 
-Using a subquery to get the “first_order”s first and then **joining back** the information by joining on both the “customer_id” and the “order_date” at the same time.
+Using a subquery to get `first_order` first and then **joining back** the information by joining on both the `customer_id` and the `order_date` at the same time.
 
 4. *What is the most purchased item on the menu and how many times was it purchased by all customers?*
 
@@ -130,8 +130,8 @@ AND max_amount = amount
 
 **Learned:**
 
-* **Grouping by two columns at the same time** to get the aggregate COUNT of every item per customer.
-* Using **CTEs** to deal with dependence: the “max_counts” table needs the “counts” table to be constructed and so the WITH clause is used so that we can have both tables side to side. We then join back both tables to get all the required information in one table.
+* **Grouping by two columns at the same time** to get the aggregate `COUNT` of every item per customer.
+* Using **CTEs** to deal with dependence: the `max_counts` table needs the `counts` table to be constructed and so the `WITH` clause is used so that we can have both tables side to side. We then join back both tables to get all the required information in one table.
 
 6. *Which item was purchased first by the customer after they became a member?*
 
@@ -165,7 +165,7 @@ AND first_date = sales_names.order_date
 
 **Learned:**
 
-**USING** keyword to join two tables on an identically named column as a shortcut.
+`USING` keyword to join two tables on an identically named column as a shortcut.
 
 7. *Which item was purchased just before the customer became a member?*
 
@@ -243,11 +243,7 @@ I’ve assumed from the way the question is worded that customer C gains points 
 
 **Learned:**
 
-Using **CASE WHEN** statement as IF-THEN programming logic to more easily differentiate between sushi (which gets 2x multiplier) and the other dishes.
-
-Using a WHERE statement ran into the problem of removing customer rows that did not buy a certain dish. Specifically here customer C never buys sushi, so they would get no “sushi points” and in the sushi points table I made for that, the row with customer C would be absent which leads to problems when trying to join back the tables later.
-
-Possibly this could be solved with UNIONs if you can keep track of what rows become NULL/get lost in grouping, but the CASE WHEN solution seems a lot simpler and efficient.
+Using `CASE WHEN` statement as `IF-THEN` programming logic to more easily differentiate between sushi (which gets 2x multiplier) and the other dishes.
 
 10. *In the first week after a customer joins the program (including their join date) they earn 2x points on all items, not just sushi - how many points do customer A and B have at the end of January?*
 
@@ -276,7 +272,7 @@ GROUP BY customer_id
 
 Once again I assume that customers get points before joining the loyalty program too, just like customer C in question 9 got points even though they aren’t a member.
 
-If the intended interpretation was that points are *only awarded after joining the program*, then I would add an extra case to the CASE WHEN statement that checks at the start if the “order_date” is smaller than or equal to the “join_date” (signifying non-membership), in which case the returned value should be 0 points.
+If the intended interpretation was that points are *only awarded after joining the program*, then I would add an extra case to the `CASE WHEN` statement that checks at the start if the “order_date” is smaller than or equal to the “join_date” (signifying non-membership), in which case the returned value should be 0 points.
 
 # Bonus:
 
@@ -317,8 +313,8 @@ ORDER BY customer_id, order_date, product_name
 
 **Notes:**
 
-* LEFT JOIN members so as to not throw away the non-members (customer C).
-* Order by “customer_id”, “order_date” and “product_name” since the original table we want to recreate has this specific order (only the top two rows are switched around by this).
+* `LEFT JOIN` members so as to not throw away the non-members (customer C).
+* Order by `customer_id`, `order_date` and `product_name` since the original table we want to recreate has this specific order (only the top two rows are switched around by this).
 
 ## Rank All The Things
 
@@ -365,4 +361,4 @@ FROM join_all
 
 **Learned:**
 
-**Window function RANK** usage, and having to choose between a CTE or repeating the condition for membership because in “join_all” I cannot call “member” in the same SELECT statement that member is instantiated. Nesting the same logic again in a single SELECT statement seemed hard to read.
+**Window function `RANK()`** usage, and having to choose between a CTE or repeating the condition for membership because in `join_all` I cannot call `member` in the same `SELECT` statement that member is instantiated. Nesting the same logic again in a single `SELECT` statement seemed hard to read.
