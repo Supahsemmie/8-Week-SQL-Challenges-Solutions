@@ -4,7 +4,7 @@
 
 https://8weeksqlchallenge.com/case-study-2/
 
-## (SQL) concepts learned
+## (SQL) Lessons Learned
 
 * Basic structure of a food delivery system.
 * Data cleaning and ways in which initial data can be "dirty".
