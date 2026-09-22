@@ -10,6 +10,7 @@ https://8weeksqlchallenge.com/case-study-1/
 * Joining back information on some kind of metric (in this case a minimal order date).
 * Using `GROUP BY` on multiple columns at the same time to get all the rows in a table where the combinations of those columns are different.
 * Working with CTEs (Common Table Expressions) to create readable pipelines for the code rather than making one big `SELECT` statement.
+* `USING` keyword to join two tables on an identically named column as a shortcut.
 * Using `CASE WHEN` statements as an analogue to `IF-THEN` programming logic.
 * First taste of window functions via use of the `RANK()` function.
 
