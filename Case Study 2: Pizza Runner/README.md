@@ -4,8 +4,10 @@
 
 https://8weeksqlchallenge.com/case-study-2/
 
-## SQL concepts learned
+## (SQL) concepts learned
 
+* Basic structure of a food delivery system.
+* Data cleaning and ways in which initial data can be "dirty".
 * Recursive CTEs and UNION ALL.
 * Usage of substr() to find a part of a string.
 * Usage of instr() to find the position of some part of a string.
