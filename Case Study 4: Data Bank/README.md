@@ -4,11 +4,19 @@
 
 https://8weeksqlchallenge.com/case-study-4/
 
-## SQL concepts learned
+## (SQL) Lessons Learned
 
+* Data structure for digital banking and data storage.
+* Manual implementation of statistical metrics: median and other percentiles.
+  * SQLite itself does not have an implementation of this, although in case study 7 I find out about an [SQLite extension](https://github.com/nalgeon/sqlean) that has an implementation of statistical functions.
 * Using SUM as a window function and controlling which rows to sum with ```ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW```.
+* Doing running balance calculations with and without compounding interest.
 * Creating **views** of query results to build other queries from later.
+* Being more conscious about renaming columns for output visibility.
+  * I might have to re-use that output column in a later query and by then the renamed column can be more tedious to write.
 * Better overall code formatting.
+* Producing a couple headline insights for marketing.
+* Creating an informational presentation slide for a management team.
 
 ## Introduction
 
