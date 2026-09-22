@@ -8,15 +8,15 @@ https://8weeksqlchallenge.com/case-study-2/
 
 * Basic structure of a food delivery system.
 * Data cleaning and ways in which initial data can be "dirty".
-* Recursive CTEs and UNION ALL.
-* Usage of substr() to find a part of a string.
-* Usage of instr() to find the position of some part of a string.
-* Usage of strftime() to parse and manipulate date/time formats.
+* Recursive CTEs and `UNION ALL`.
+* Usage of `substr()` to find a part of a string.
+* Usage of `instr()` to find the position of some part of a string.
+* Usage of `strftime()` to parse and manipulate date/time formats.
 * Proper SQL standard of using single quotes for string literals, and double quotes for delimited identifiers (identifier names that otherwise would be syntactically invalid).
   * SQLite let me get away with ignoring this for a while.
-* Usage of the aggregate function group_concat().
-* Usage of (NOT) EXISTS to compare rows in one table to rows from another table.
-* CROSS JOIN to join every column from one table to every column from another table.
+* Usage of the aggregate function `group_concat()`.
+* Usage of `(NOT) EXISTS` to compare rows in one table to rows from another table.
+* `CROSS JOIN` to join every column from one table to every column from another table.
 
 ## Introduction
 
