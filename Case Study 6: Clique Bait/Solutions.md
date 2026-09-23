@@ -98,17 +98,18 @@ CREATE TABLE events (
 
 Using DbSchema (version 10.4.0), our ERD looks like this:
 
-image
+![](images/ERD.png)
+
 **Note:**
 
 I foresee two possible issues:
 
-1. The “events” table has no primary key, there is currently no way to identify rows using a single column. The “event_time” column might be unique due to its time precision, but there is no guarantee that two people will not visit the website at the exact same time. I might add another auto-increment ID later on if necessary.
+1. The `events` table has no primary key, there is currently no way to identify rows using a single column. The `event_time` column might be unique due to its time precision, but there is no guarantee that two people will not visit the website at the exact same time. I might add another auto-increment ID later on if necessary.
 
 
-2. The “products” column from the "campaign_identifier" table has a range of products (e.g. 1-3) as values rather than individual products. This means that we cannot join that table to “page_hierarchy” on “product_id”. 
+2. The `products` column from the `campaign_identifier` table has a range of products (e.g. 1-3) as values rather than individual products. This means that we cannot join that table to `page_hierarchy` on `product_id`. 
 
-   If we split the range of products over multiple rows (which we will probably have to do at some point), then we can fix this problem. However, the “campaign_id” will then no longer be unique and hence not be suitable as a primary key for the “campaign_identifier” table anymore. We can solve that by making a junction table for pairs of (“campaign_id”, “products”) and having that exist alongside the original table.
+   If we split the range of products over multiple rows (which we will probably have to do at some point), then we can fix this problem. However, the `campaign_id` will then no longer be unique and hence not be suitable as a primary key for the `campaign_identifier` table anymore. We can solve that by making a junction table for pairs of (`campaign_id`, `products`) and having that exist alongside the original table.
 
 ### 2. Digital Analysis
 
@@ -261,8 +262,11 @@ WHERE NOT EXISTS (
 | 9.1            |
 
 **Note:**
-This query took about 3 seconds to complete because the WHERE NOT EXISTS clause has to loop through the entire “events” table many times to look for specific “event_types”. I want to optimize this by adding a (composite) index to the “events” table for pairs of (visit_id, event_type):
+
+This query took about 3 seconds to complete because the `WHERE NOT EXISTS` clause has to loop through the entire `events` table many times to look for specific `event_types`. I want to optimize this by adding a (composite) index to the `events` table for pairs of (`visit_id`, `event_type`):
+
 **Query:**
+
 
 ```sql
 CREATE INDEX idx_events_visit_type
@@ -270,11 +274,16 @@ ON events (visit_id, event_type)
 ```
 
 **Result:**
+
 The percentage calculation query can now be completed in \~20ms.
+
 **Note/Learned:**
+
 Basic indexing of tables to speed up performance when searching for specific values over and over. 
-However, since this table is likely to be updated many times, the index would also constantly have to be updated. Hence, in a real-life setting at a certain scale this could become problematic. 
-One other approach that one could try is to first query a small table using a CTE that only tracks if a specific visit had checkout views and if it had purchase events. Then later on we can use this result directly to count the occurrences of visits with a checkout view but without a purchase event.
+
+However, since this table is likely to be updated many times, the index would also constantly have to be updated. Hence, in a real-life setting at a certain scale this *could* become problematic if the goal is highly frequent analytics. 
+
+One other approach that one could try is to first query a small table using a CTE that only tracks if a specific visit had checkout views and if it had purchase events. Then later on we can use this result directly to count the occurrences of visits with a checkout view but without a purchase event. This is more scalable but for the current challenge the index approach suffices so I will leave it at that.
 
 7. *What are the top 3 pages by number of views?*
 
@@ -358,9 +367,9 @@ LIMIT 3
 
 **Note:**
 
-- We count cart adds per product, because the “purchase” event does not mention what was purchased. Hence, we need to track what products were added to the cart in the visits that have a purchase.
+- We count cart adds per product, because the `purchase` event does not mention what was purchased. Hence, we need to track what products were added to the cart in the visits that have a purchase.
 - The dataset is limited in that it does not track people removing items from carts, probably for simplicity. If that were a possibility, then we would have to instead first track every product’s timeline per visit (add to cart, removed from cart etc.), and then look if the last action for that product that visit was either an add or a remove before counting it as a product purchase.
-- Our (visit_id, event_type) index from earlier speeds the query up once more.
+- Our (`visit_id`, `event_type`) index from earlier speeds the query up once more.
 
 ### 3. Product Funnel Analysis
 
@@ -410,6 +419,7 @@ ORDER BY page_id
 | Oyster         | 1568       | 943               | 217           | 726           |
 
 *Additionally, create another table which further aggregates the data for the above points but this time for each product category instead of individual products.*
+
 **Query:**
 
 ```sql
@@ -443,12 +453,12 @@ ORDER BY page_id
 | Shellfish            | 6204       | 3792              | 894           | 2898          |
 
 **Learned:**
-Usage of **MAX** and **SUM** over booleans (which are numerically stored as 0 or 1 in SQLite), e.g. 
-SUM(event_type = 1)  
-sums exactly 1 if there was a view and 0 otherwise: it counts how many views there were.
+
+Usage of `MAX` and `SUM` over booleans (which are numerically stored as 0 or 1 in SQLite), e.g. `SUM(event_type = 1)` adds 1 to the count if there was a view and 0 otherwise: it counts how many views there were.
 
 **Note:**
-We create 2 new views called “product_funnel” and “category_funnel” which view the results of the product and product category queries respectively.
+
+We create 2 new views called `product_funnel` and `category_funnel` which view the results of the product and product category queries respectively.
 
 *Using your 2 new output tables - answer the following questions:*
 
@@ -583,26 +593,16 @@ FROM product_funnel
 
 *Generate a table that has 1 single row for every unique* *`visit_id`* *record and has the following columns:*
 
--
-
-```
-user_id
-```
-
-1.
-
-```
-visit_id
-```
-
-1. *`visit_start_time`**: the earliest* *`event_time`* *for each visit*
-2. *`page_views`**: count of page views for each visit*
-3. *`cart_adds`**: count of product cart add events for each visit*
-4. *`purchase`**: 1/0 flag if a purchase event exists for each visit*
-5. *`campaign_name`**: map the visit to a campaign if the* *`visit_start_time`* *falls between the* *`start_date`* *and* *`end_date`*
-6. *`impression`**: count of ad impressions for each visit*
-7. *`click`**: count of ad clicks for each visit*
-8. ***(Optional column)*** *`cart_products`**: a comma separated text value with products added to the cart sorted by the order they were added to the cart (hint: use the* *`sequence_number`**)*
+* `user_id`
+* `visit_id`
+* *`visit_start_time`: the earliest* *`event_time`* *for each visit*
+* *`page_views`: count of page views for each visit*
+* *`cart_adds`: count of product cart add events for each visit*
+* *`purchase`: 1/0 flag if a purchase event exists for each visit*
+* *`campaign_name`: map the visit to a campaign if the* *`visit_start_time`* *falls between the* *`start_date`* *and* *`end_date`*
+* *`impression`: count of ad impressions for each visit*
+* *`click`: count of ad clicks for each visit*
+* ***(Optional column)*** *`cart_products`: a comma separated text value with products added to the cart sorted by the order they were added to the cart (hint: use the* *`sequence_number`)*
 
 **Query:**
 
@@ -680,15 +680,8 @@ LEFT JOIN cart_products USING (visit_id)
 
 **Note/learned:**
 
-- We save our result as a view called “visits” for later use.
-
-* I learned about **conditional joins** to join the “campaign_identifier” table depending on what the “visit_start_time” was for that visit.
-* At first I checked what time the visit started at by using:
-
-v.visit_start_time BETWEEN c.start_date AND c.end_date
-However, when doing analysis later on I realized that this will not include visits that happened on the “end_date” itself, since “visit_times” also contain   hours/seconds/milliseconds. 
-
-The fix is to write “date(v.visit_start_time)” instead to truncate anything but the date itself.
+* We save our result as a view called `visits` for later use.
+* I learned about **conditional joins** to join the `campaign_identifier` table depending on what the `visit_start_time` was for that visit.
 
 *Use the subsequent dataset to generate at least 5 insights for the Clique Bait team - bonus: prepare a single A4 infographic that the team can use for their management reporting sessions, be sure to emphasise the most important points from your findings.*
 *Some ideas you might want to investigate further include:*
@@ -766,6 +759,7 @@ JOIN non_impressions USING (campaign_name)
 - *Does clicking on an impression lead to higher purchase rates?*
 
 **Answer:**
+
 See the answer to the next question.
 
 - *What is the uplift in purchase rate when comparing users who click on a campaign impression versus users who do not receive an impression? What if we compare them with users who just get an impression but do not click?*
@@ -832,11 +826,12 @@ CROSS JOIN no_click
 | 0.99                    | 0.79                             | 1.0                        | 25.3                                   | -1.0                             |
 
 **Answer:**
-These calculations look at if users have had an impression or purchase during *any of their visits* collectively. An impression and purchase per user do not have to have been made during the same visit to count. 
-We can see that:
 
-- Whether a user clicks on an impression or not does not have a significant effect on the purchase rate.
-- Users that get an impression during any of their visits have about a 25% uplift in purchase rate compared to users that do not.
+These calculations look at if users have had an impression or purchase during *any of their visits* collectively. An impression and purchase per user do not have to have been made during the same visit to count. 
+
+We can see that whether a user clicks on an impression or not does not have a significant effect on the purchase rate. 
+
+Furthermore, users that get an impression during any of their visits have about a 25% uplift in purchase rate compared to users that do not.
 
 * *What metrics can you use to quantify the success or failure of each campaign compared to each other?*
 
@@ -933,8 +928,8 @@ JOIN no_click USING (campaign_name)
 3. And once again “Half Off - Treat Your Shellf(ish)” scores best at purchases with an 176% uplift.
 4. Whether a user clicks on an impression or not does not seem to have a significant effect on the purchase rate in general. Only the campaign “25% Off - Living The Lux Life“ saw a decent effect where there was a \~13% increase.
 5. Users that get an impression during any of their visits have about a 25% general uplift in purchase rate compared to users that do not.
-6.  “BOGOF - Fishing For Compliments” has the highest percentual increase in purchase rate between users that had an impression versus those who did not at about 52%.
+6. “BOGOF - Fishing For Compliments” has the highest percentual increase in purchase rate between users that had an impression versus those who did not at about 52%.
 
 **Infographic:**
 
-**image**
+![](images/campaign_analysis_report.png)
