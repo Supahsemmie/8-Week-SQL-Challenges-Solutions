@@ -203,9 +203,9 @@ As a result, I’ve had to make an assumption regarding percentile positions sin
 
 $p\ \cdot \ (n+\ 1)$
 
-Although it needs to be said: since the metric in question here is reallocation time (“r\_time”), which is always in an *integer* amount of days, the above assumption is not very important for the result of the calculations. 
+Although it needs to be said: since the metric in question here is reallocation time (`r_time`), which is always in an *integer* amount of days, the above assumption is not very important for the result of the calculations. 
 
-Furthermore, I’ve chosen to **linearly interpolate** the values for the p-th percentile rather than rounding for the nearest value in the dataset. For example, if the 80th-percentile position is 12.35, then we linearly interpolate (a(1-t) \* bt)  between the value $a$ at position 12  and the value $b$ at position 13 by doing:
+Furthermore, I’ve chosen to **linearly interpolate** the values for the p-th percentile rather than rounding for the nearest value in the dataset. For example, if the 80th-percentile position is 12.35, then we linearly interpolate $a(1-t) \cdot bt$  between the value $a$ at position 12  and the value $b$ at position 13 by doing:
 
 $a\ \cdot \ 0.65\ +\ b\ \cdot \ 0.35{\ }$ 
 
@@ -234,7 +234,7 @@ GROUP BY txn_type
 
 **Note:**
 
-The question asks for a “unique” count, so I checked if there are any duplicate rows in the “customer\_transactions” table that could influence the count. According to this query, there are not, so we are done:
+The question asks for a “unique” count, so I checked if there are any duplicate rows in the `customer_transactions` table that could influence the count. According to this query, there are none, so we are done:
 
 ```sql
 WITH no_duplicates AS (
@@ -447,11 +447,11 @@ ORDER BY "Customer id", Month
 
 **Learned:** 
 
-Using **SUM** as a window function and controlling which rows to sum with **ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW.**
+Using `SUM` as a window function and controlling which rows to sum with `ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW`.
 
 **Note:**
 
-I’ve added rows for the balance of customers even in months where they do not perform any deposits, purchases or withdrawals, up until the final\_month which is calculated by the query. In the current dataset the final month is April 2020 (or month 4). 
+I’ve added rows for the balance of customers even in months where they do not perform any deposits, purchases or withdrawals, up until the `last_month` which is calculated by the query. In the current dataset the final month is April 2020 (or month 4). 
 
 5. *What is the percentage of customers who increase their closing balance by more than 5%?*
 
@@ -514,7 +514,7 @@ WHERE percentage_increase > 5
 
 For the percentual increase formula, we need to divide by the absolute value of the previous/old value to make sure that negative balances becoming more negative correspond to a negative increase, not a positive one.
 
-Also, if a customer had a balance of 0 at some point and increased it after, this formula yields a percentual increase of NULL, even though they technically increased their balance by “an infinite percentage”. 
+Also, if a customer had a balance of 0 at some point and increased it after, this formula yields a percentual increase of `NULL`, even though they technically increased their balance by “an infinite percentage”. 
 
 ### **C. Data Allocation Challenge**
 
@@ -536,9 +536,9 @@ Also, if a customer had a balance of 0 at some point and increased it after, thi
 
 Customers with a non-positive balance either owe the bank or have no money in the Data Bank, and hence it makes sense that they are allocated no data at all. This should be the case whether this balance is checked at the end of the month, calculated as an average or after every transaction. So, in the upcoming calculations we only consider customer’s positive balances as only those should (in some yet undecided proportion) directly correlate to how much data the customers are allocated.
 
-The customer balance at the end of each month has already been calculated in question B4 and made into a view called **“customer\_balance\_per\_month”**. So now we can take that framework to perform new calculations for the 3 different options.
+The customer balance at the end of each month has already been calculated in question B4 and made into a view called `customer_balance_per_month`. So now we can take that framework to perform new calculations for the 3 different options.
 
-Finally, while the transactions given by “txn\_date” happen someplace during that date, the dataset does not have enough granularity to tell us exactly when on the day it happens. Therefore, I will assume that they essentially all take place at the end of the day. This matters a bit in some edge cases where we are counting differences between dates (julianday differences). This assumption makes the math work in the sense that now all transactions are exactly days apart from each other.
+Finally, while the transactions given by `txn_date` happen someplace during that date, the dataset does not have enough granularity to tell us exactly when on the day it happens. Therefore, I will assume that they essentially all take place at the end of the day. This matters a bit in some edge cases where we are counting differences between dates (julianday differences). This assumption makes the math work in the sense that now all transactions are exactly days apart from each other.
 
 #### **Option 1:**
 
@@ -600,7 +600,7 @@ ORDER BY customer_id, txn_date
 | 3 | 2020-03-19 | \-1222 |
 | 3 | 2020-04-12 | \-729 |
 
-This result will be saved as a view called **“customer\_running\_balances”** to be reused here and for option 3 later.
+This result will be saved as a view called `customer_running_balances` to be reused here and for option 3 later.
 
 From this, we can immediately calculate the minimum and maximum running balances of every customer per month.
 
@@ -631,7 +631,7 @@ GROUP BY customer_id, "Month"
 
 To calculate the average balance over the last 30 days (which I’m going to count in terms of months, since the goal is summarising on a monthly basis), we need to also know how many days each balance was held, so that we can do a weighted average. For example, if someone’s balance in month 1 was at 1000 for 29 days, but then went down to 0 on the final day, their average should not just be the average of 1000 and 0, but much closer to 1000 as their balance was at 1000 for essentially the entire month. 
 
-To do this, we take the running balance table again and now add a column that tracks how many days that balance was held (**“balance\_durations”** CTE below). Then we can later average over this per month and get our result. We also need to add rows to track what the balance was at the start of each month after the customer joined Data Bank, which happens in the **“first\_days\_balances”** CTE.
+To do this, we take the running balance table again and now add a column that tracks how many days that balance was held (`balance_durations` CTE below). Then we can later average over this per month and get our result. We also need to add rows to track what the balance was at the start of each month after the customer joined Data Bank, which happens in the `first_days_balances` CTE.
 
 **Query:**
 
@@ -782,7 +782,7 @@ ORDER BY "Customer id", "Month"
 | 5 | 3 | \-858.9 |
 | 5 | 4 | \-2396.1 |
 
-Writing this result as the view **“customer\_avg\_monthly\_balances”**, we can now sum all the averages grouped by all customers and get an idea of the global (positive) average balance. Hence, we get to see per month how much total data should be allocated on average to all customers.
+Writing this result as the view `customer_avg_monthly_balances`, we can now sum all the averages grouped by all customers and get an idea of the global (positive) average balance. Hence, we get to see per month how much total data should be allocated on average to all customers.
 
 **Query:**
 
@@ -806,7 +806,7 @@ GROUP BY "Month"
 
 #### **Option 3:**
 
-If data allocation is updated in real time, then our **“customer\_running\_balances”** table already gives us the data allocation per customer at the times of the transaction dates. 
+If data allocation is updated in real time, then our `customer_running_balances` view already gives us the data allocation per customer at the times of the transaction dates. 
 
 If we want to see how this translates to a total data allocation to all customers on a monthly basis, then we need to consider the customer’s balance at the finest granular detail of this dataset: every day of every month. 
 
@@ -918,11 +918,11 @@ ORDER BY customer_id, txn_date
 | 1 | 2020-01-19 | 312 |
 | 1 | 2020-01-20 | 312 |
 
-Writing this result as the view **“customer\_daily\_balances”**, we add all positive balances of all customers for every day and graph the resulting data allocation distribution for every month.
+Writing this result as the view `customer_daily_balances`, we add all positive balances of all customers for every day and graph the resulting data allocation distribution for every month.
 
 **Note:**
 
-I should more consciously choose to rename column names like “customer\_id” to “Customer id”. The extra bit of better presentation does not matter much for a simple query result, and in future views if I want to call this column again, I now have to type the new column name which is slightly more tedious.
+I should more consciously choose to rename column names like `customer_id` to `Customer id`. The extra bit of better presentation does not matter much for a simple query result, and in future views if I want to call this column again, I now have to type the new column name which is slightly more tedious.
 
 **Query:**
 
@@ -1020,13 +1020,11 @@ With an annual interest rate of 6%, that means that every day a customer earns:
 
 $\ \frac{6%}{365}\ \times \ current\ balance\ \approx \ 0.000164\ \times \ current\ balance{\ }$
 
-Hence, we can just multiply every customer’s balance at the end of the day by 0.06/365 to get their earned interest value. 
+Hence, we can just multiply every customer’s balance at the end of the day by $\frac{0.06}{365} to get their earned interest value. 
 
 Nothing in the case study’s text implies that there is an interest rate from Data Bank on negative balances that the customer needs to pay back, which I assume is for simplicity’s sake. Hence we once again remove any negative balances for this case, since customers will not earn any data allocation off of positive interest when their bank account is negative. 
 
-At first I tried to solve this by selecting from the **“customer\_daily\_balances”** view, but this turned into a dead end as I lacked some way to carry over the interest calculation between transaction dates (since the days with transactions on them already exist as rows in the table, so I can’t add them via recursion). 
-
-The idea now is to start with an initialization table where every customer only has the first day in the dataset (2020-01-01) and track how the balance should change on any given days. Then, we can just recursively add new rows and track the balance directly and add the interest calculation.
+The idea is to start with an initialization CTE where every customer only has a row for the first day in the dataset (2020-01-01) and track how the balance should change on any given days. Then, we can just recursively add new rows and track the balance directly and add the interest calculation.
 
 By not applying interest rates to the balances themselves, we avoid compounding interest.
 
@@ -1142,7 +1140,7 @@ GROUP BY "Month"
 | 3 | 1365.74 |
 | 4 | 1288.21 |
 
-Now we consider compounding interest as well. Our setup is already well-versed to add compounding interest: we simply only need to apply interest to the balance calculations, the rest is completely the same as before.
+Now we consider compounding interest as well. Our setup is already well-versed to add compounding interest: we only need to apply interest to the balance calculations, the rest is completely the same as before.
 
 **Query:**
 
