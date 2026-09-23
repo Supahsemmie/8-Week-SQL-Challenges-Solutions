@@ -10,7 +10,7 @@ https://8weeksqlchallenge.com/case-study-6/
 * Working with basic ad impressions/click numbers
 * Working with indexes to speed up queries, especially when repeatedly scanning through a large table.
 * Usage of `MAX` and `SUM` over booleans (which are numerically stored as 0 or 1 in SQLite).
-    * For example: `SUM(event_type = 1)` adds 1 to the count if there was a page view and 0 otherwise: it counts how many page views there were.
+    * For example: `SUM(event_type = 1)` adds 1 to the count if there was a page view for the online store and 0 otherwise: it counts how many page views there were.
 * Conditional joins.
 * Campaign analysis + insights showcased in an infographic for management reporting.
 
