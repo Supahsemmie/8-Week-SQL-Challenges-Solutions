@@ -1,4 +1,4 @@
-# **Balanced Tree Clothing Co.**
+# **Balanced Tree Clothing Company**
 
 [https://8weeksqlchallenge.com/case-study-7/](https://8weeksqlchallenge.com/case-study-7/)
 
