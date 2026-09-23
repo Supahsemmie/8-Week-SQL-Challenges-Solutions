@@ -8,7 +8,7 @@ Queries written in (DB browser for) SQlite. 
 
 ### 1. Data Cleansing Steps
 
-*In a single query, perform the following operations and generate a new table in the* *`data_mart`* *schema named* *`clean_weekly_sales`**:*
+*In a single query, perform the following operations and generate a new table in the* *`data_mart`* *schema named* *`clean_weekly_sales`:*
 
 - *Convert the* *`week_date`* *to a* *`DATE`* *format*
 
@@ -183,7 +183,7 @@ FROM clean_week_dates
 
 **Note:**
 
-Since SQlite does not support automatically converting the date formats, I’ve taken this as an exercise in string manipulation. The logic for that is written in “day_week_year” and then concatenated in “clean_week_dates”. These CTEs also contain a lot of the other columns so I can pass those through later rather than having to write a join statement (and needing to create some kind of identifiers to link to).
+Since SQlite does not support automatically converting the date formats, I’ve taken this as an exercise in string manipulation. The logic for that is written in `day_week_year` and then concatenated in `clean_week_dates`. These CTEs also contain a lot of the other columns so I can pass those through later rather than having to write a join statement (and needing to create some kind of identifiers to link to).
 
 ### 2. Data Exploration
 
@@ -248,8 +248,10 @@ FROM min_and_max
 
 **Note:**
 
-After taking a look at the result from “present_week_numbers”, I could see that there were no gaps from weeks 12 to 36. Hence, I know that all the missing weeks are the weeks before and after that. 
-If there were gaps, one could generate a CTE which has all week numbers, and then use a NOT EXISTS statement to find the missing week numbers.
+After taking a look at the result from `present_week_numbers`, I could see that there were no gaps from weeks 12 to 36. Hence, I know that all the missing weeks are the weeks before and after that. 
+
+If there were gaps, one could generate a CTE which has all week numbers, and then use a `NOT EXISTS` statement to find the missing week numbers.
+
 After that we can concatenate all missing week numbers, and maybe group some together in a range (e.g. 2-6) if necessary. Since the numbers are simple in this exercise, I’ve chosen to go with the simpler query at the cost of some scalability.
 
 3. *How many total transactions were there for each year in the dataset?*
@@ -321,6 +323,7 @@ FROM total_sales
 ![](images/monthly_sales_per_region.png)
 
 **Note:**
+
 There is a noticeable dip in all sales in June 2020: exactly when the packaging change was introduced.
 What is also interesting is that the usual April dip in sales was very minor in 2020 compared to the other years. There was even a peak in June 2020 when in the other years there’s a valley during June.
 
@@ -528,7 +531,7 @@ GROUP BY calendar_year, platform
 *We would include all* *`week_date`* *values for* *`2020-06-15`* *as the start of the period* ***after*** *the change and the previous* *`week_date`* *values would be* ***before***
 *Using this analysis approach - answer the following questions:*
 
-1. *What is the total sales for the 4 weeks before and after* *`2020-06-15`**? What is the growth or reduction rate in actual values and percentage of sales?*
+1. *What is the total sales for the 4 weeks before and after* *`2020-06-15`? What is the growth or reduction rate in actual values and percentage of sales?*
 
 **Query:**
 
@@ -889,7 +892,7 @@ ORDER BY "Relative change"
 
 **Answer:**
 
-The most impacted group is the group of middle aged customers. The “unknown” age bands give us no tangible information, so we can discard it.
+The most impacted group is the group of middle aged customers. The `unknown` age bands give us no tangible information, so we can discard it.
 
 - ### demographic
 
@@ -951,7 +954,7 @@ ORDER BY "Relative change"
 
 **Answer:**
 
-The most impacted group here is the group of families. The “unknown” demographic gives us no tangible information, so we can discard it.
+The most impacted group here is the group of families. The `unknown` demographic gives us no tangible information, so we can discard it.
 
 - ### customer type
 
@@ -1017,7 +1020,7 @@ The most impacted groups here are the group of Guests and the Existing customers
 
 **Note:**
 
-This time we do not discard the `Guest` customer types, because they do give tangible information: people who are not part of the Data Mart customer system have different sales than people who are. In contrast, `Unknown` age bands and demographics don’t tell us anything at all.
+This time we do not discard the `Guest` customer types, because they do give tangible information: people who are not part of the Data Mart customer system have different sales than people who are. In contrast, `unknown` age bands and demographics don’t tell us anything useful at all.
 
 One possible interpretation of the relative decrease in guest sales is that guests might be the least loyal, and therefore are quicker to go to other competitors when a new change like this happens.
 
