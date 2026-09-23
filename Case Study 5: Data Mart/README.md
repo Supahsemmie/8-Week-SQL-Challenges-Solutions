@@ -4,9 +4,12 @@
 
 https://8weeksqlchallenge.com/case-study-5/
 
-## SQL concepts learned
+## (SQL) Lessons Learned
 
-* 
+* Data structure of a large international store with multiple branches and platforms.
+* Working with a singular "super" table that contains many columns.
+* Date format string manipulation.
+* Before and after analysis of sales as the result of product changes in a business.
 
 ## Introduction
 
@@ -54,7 +57,6 @@ Each record in the dataset is related to a specific aggregated slice of the unde
 | 29/5/19 | SOUTH AMERICA | Shopify | null | New | 53 | 10056.2 |
 | 22/8/18 | AFRICA | Retail | null | Existing | 31721 | 1718863.58 |
 | 25/7/18 | SOUTH AMERICA | Retail | null | New | 2136 | 81757.91 |
-
 
 
 ## Entity Relationship Diagram
