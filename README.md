@@ -1,7 +1,7 @@
 # The 8-Week SQL Challenges
 This is a repository of my solutions to all the questions from the 8 case studies found [here](https://8weeksqlchallenge.com/) (created by Danny Ma). 
 
-These case studies cover different aspects of data analysis used in several business sectors, such as online banking, shopping, marketing, subscription based services and more! 
+These case studies cover different aspects of data analysis used in several business sectors, such as (online) banking, shopping, marketing, subscription based services and more! 
 
 The solution queries are all in SQLite and written using DB Browser for SQLite (version 3.13.1).
 
