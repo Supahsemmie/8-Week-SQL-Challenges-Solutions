@@ -1,4 +1,4 @@
-# Balanced Tree Clothing Co.
+# Balanced Tree Clothing Company
 
 ## Source
 
@@ -6,7 +6,14 @@ https://8weeksqlchallenge.com/case-study-7/
 
 ## (SQL) Lessons Learned
 
-* 
+* **Self-joining multiple times** to create permutations.  
+* **Filtering by ordering items** to remove duplicate tuples and only keep the combinations.
+  * For example say we have three items of the same type (let's say three product names p1, p2 and p3). By writing
+  
+    `WHERE p1 < p2 AND p2 < p3`
+  
+    we only keep exactly one combination of three products per triple: the one alphabetically ordered with (p1, p2, p3). All the other combinations like (p2, p3, p1) and (p3, p1, p2) etc. are discarded.
+*
 
 
 ## Introduction
