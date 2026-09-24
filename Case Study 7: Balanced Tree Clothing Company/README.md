@@ -6,14 +6,16 @@ https://8weeksqlchallenge.com/case-study-7/
 
 ## (SQL) Lessons Learned
 
-* **Self-joining multiple times** to create permutations.  
-* **Filtering by ordering items** to remove duplicate tuples and only keep the combinations.
+* Self-joining multiple times to create permutations.  
+* Filtering by ordering items to remove duplicate tuples and only keep the combinations.
   * For example say we have three items of the same type (let's say three product names p1, p2 and p3). By writing
   
     `WHERE p1 < p2 AND p2 < p3`
   
     we only keep exactly one combination of three products per triple: the one alphabetically ordered with (p1, p2, p3). All the other combinations like (p2, p3, p1) and (p3, p1, p2) etc. are discarded.
-*
+* Writing a scheduled SQL report to be used for full case analysis on a monthly basis.
+* Using temporary tables to re-use a subset of data over many queries.
+* Recursively constructing a product dataset from a hierarchy table.
 
 
 ## Introduction
