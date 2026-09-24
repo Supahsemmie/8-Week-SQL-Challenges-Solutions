@@ -6,7 +6,12 @@ https://8weeksqlchallenge.com/case-study-8/
 
 ## (SQL) Lessons Learned
 
-* 
+* Analyzing and interpreting business trends in online ad click behaviour.
+* Evaluating removal of incomplete data.
+* When counting `DISTINCT` values based on some condition, it is important that the `CASE WHEN` statement returns the value you are counting, rather than just returning 1 like I was used to.
+  * This is because the `DISTINCT` keyword acts on the resulting column that is returned.
+* Segment analysis: comparing performance of ad interests within a single segment/client business.
+* Index analysis: comparing between client businesses as well as differentiating these from the marketing agency.
 
 
 ## Introduction
