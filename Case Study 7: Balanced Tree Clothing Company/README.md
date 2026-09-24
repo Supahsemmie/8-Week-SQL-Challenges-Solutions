@@ -6,6 +6,7 @@ https://8weeksqlchallenge.com/case-study-7/
 
 ## (SQL) Lessons Learned
 
+* Product sales data structure when every product has many attributes.
 * Self-joining multiple times to create permutations.  
 * Filtering by ordering items to remove duplicate tuples and only keep the combinations.
   * For example say we have three items of the same type (let's say three product names p1, p2 and p3). By writing
