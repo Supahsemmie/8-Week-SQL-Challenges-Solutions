@@ -50,38 +50,38 @@ The `customer_orders` and `runner_orders` tables have a lot of different ways to
 ```sql
 UPDATE runner_orders
 SET pickup_time = NULL
-WHERE pickup_time = `null`;
+WHERE pickup_time = 'null';
 
 UPDATE runner_orders
 SET distance = NULL
-WHERE distance = `null`;
+WHERE distance = 'null';
 
 UPDATE runner_orders
-SET distance = CAST(TRIM(REPLACE(distance, `km`, ``)) AS REAL);
+SET distance = CAST(TRIM(REPLACE(distance, 'km', '')) AS REAL);
 --(future comment): TRIM was probably unnecessary if cast as REAL anyway
 
 UPDATE runner_orders
 SET duration = NULL
-WHERE duration = `null`;
+WHERE duration = 'null';
 
 UPDATE runner_orders
-SET duration = CAST(TRIM(REPLACE(duration, `%min%`, ``)) AS INTEGER);
+SET duration = CAST(TRIM(REPLACE(duration, '%min%', '')) AS INTEGER);
 --(future comment): Same deal as above
 
 UPDATE runner_orders
 SET cancellation = NULL
-WHERE cancellation IN (`null`, ``);
+WHERE cancellation IN ('null', '');
 
 UPDATE runner_orders
 SET pickup_time = REPLACE(pickup_time, '2020', '2021');
 
 UPDATE customer_orders
 SET exclusions = NULL
-WHERE exclusions IN (`null`, ``);
+WHERE exclusions IN ('null', '');
 
 UPDATE customer_orders
 SET extras = NULL
-WHERE extras IN (`null`, ``);
+WHERE extras IN ('null', '');
 ```
 
 **Cleaned customer_orders table:**
@@ -158,7 +158,7 @@ WITH RECURSIVE clean_recipes AS (
     SELECT 
         pizza_id,
         CASE 
-            WHEN instr(remaining, ',') = 0 THEN CAST(remaining AS INTEGER) --Same as base case, but continuing from `remaining`
+            WHEN instr(remaining, ',') = 0 THEN CAST(remaining AS INTEGER) --Same as base case, but continuing from 'remaining'
             ELSE 
                 CAST(
                     substr(remaining, 1, instr(remaining, ',') - 1)
@@ -200,22 +200,22 @@ FROM clean_recipes
 
 The `customer_orders` table still has a problem. The exclusions and extras columns are also lists, so we have the same problem as before. We cannot just apply recursion again directly, because every row in `customer_orders` corresponds to exactly one ordered pizza. If we split the lists over multiple rows, we will no longer be able to tell the difference between a pizza that has 2 extra toppings, and two pizzas that each have one of those extra toppings.
 
-To remedy this, we first introduce a new column to `customer_orders` called **order_item_id** that tracks the ordered pizzas individually as a PRIMARY KEY. Next, we need two auxiliary tables called **`customer_orders_exclusions`** and **`customer_orders_extras`** that simply track the order_item_id and what exclusions/extras there are respectively. Once all that is in place, we can call these auxiliary tables whenever we have to work with pizza exclusion/extras.
+To remedy this, we first introduce a new column to `customer_orders` called `order_item_id` that tracks the ordered pizzas individually as a `PRIMARY KEY`. Next, we need two auxiliary tables called `customer_orders_exclusions` and `customer_orders_extras` that simply track the `order_item_id` and what exclusions/extras there are respectively. Once all that is in place, we can call these auxiliary tables whenever we have to work with pizza exclusion/extras.
 
 **Query to add `order_item_id` column:**
 
 ```sql
-CREATE TABLE IF NOT EXISTS `customer_orders_cleaned` (
-    `order_id`    INTEGER,
-    `customer_id`    INTEGER,
-    `order_item_id` INTEGER,
-    `pizza_id`    INTEGER,
-    `exclusions`    TEXT,
-    `extras`    TEXT,
-    `order_time`    TEXT,
-    PRIMARY KEY(`order_item_id` AUTOINCREMENT),
-    FOREIGN KEY(`order_id`) REFERENCES `runner_orders`(`order_id`),
-    FOREIGN KEY(`pizza_id`) REFERENCES `pizza_recipes`(`pizza_id`)
+CREATE TABLE IF NOT EXISTS 'customer_orders_cleaned' (
+    'order_id'    INTEGER,
+    'customer_id'    INTEGER,
+    'order_item_id' INTEGER,
+    'pizza_id'    INTEGER,
+    'exclusions'    TEXT,
+    'extras'    TEXT,
+    'order_time'    TEXT,
+    PRIMARY KEY('order_item_id' AUTOINCREMENT),
+    FOREIGN KEY('order_id') REFERENCES 'runner_orders'('order_id'),
+    FOREIGN KEY('pizza_id') REFERENCES 'pizza_recipes'('pizza_id')
 );
 
 INSERT INTO customer_orders_cleaned (order_id, customer_id, pizza_id, exclusions, extras, order_time)
@@ -247,20 +247,20 @@ FROM customer_orders
 **Query to create `customer_orders_exclusions` and `customer_orders_extras`:**
 
 ```sql
-CREATE TABLE IF NOT EXISTS `customer_orders_exclusions`(
-    `order_item_id` INTEGER,
-    `exclusion_id` INTEGER,
-    PRIMARY KEY (`order_item_id`, `exclusion_id`),
-    FOREIGN KEY(`order_item_id`) REFERENCES `customer_orders_cleaned`(`order_item_id`),
-    FOREIGN KEY(`exclusion_id`) REFERENCES `pizza_toppings`(`topping_id`)
+CREATE TABLE IF NOT EXISTS 'customer_orders_exclusions'(
+    'order_item_id' INTEGER,
+    'exclusion_id' INTEGER,
+    PRIMARY KEY ('order_item_id', 'exclusion_id'),
+    FOREIGN KEY('order_item_id') REFERENCES 'customer_orders_cleaned'('order_item_id'),
+    FOREIGN KEY('exclusion_id') REFERENCES 'pizza_toppings'('topping_id')
 );
 
-CREATE TABLE IF NOT EXISTS `customer_orders_extras`(
-    `order_item_id` INTEGER,
-    `extra_id` INTEGER,
-    PRIMARY KEY (`order_item_id`, `extra_id`),
-    FOREIGN KEY(`order_item_id`) REFERENCES `customer_orders_cleaned`(`order_item_id`),
-    FOREIGN KEY(`extra_id`) REFERENCES `pizza_toppings`(`topping_id`)
+CREATE TABLE IF NOT EXISTS 'customer_orders_extras'(
+    'order_item_id' INTEGER,
+    'extra_id' INTEGER,
+    PRIMARY KEY ('order_item_id', 'extra_id'),
+    FOREIGN KEY('order_item_id') REFERENCES 'customer_orders_cleaned'('order_item_id'),
+    FOREIGN KEY('extra_id') REFERENCES 'pizza_toppings'('topping_id')
 );
 
 WITH RECURSIVE string_split_exclusions AS (
@@ -461,8 +461,8 @@ GROUP BY pizza_name
 ```sql
 SELECT
     customer_id,
-    COUNT(CASE WHEN pizza_name = `Meatlovers` THEN 1 END) AS meatlovers_ordered,
-    COUNT(CASE WHEN pizza_name = `Vegetarian` THEN 1 END) AS vegetarians_ordered
+    COUNT(CASE WHEN pizza_name = 'Meatlovers' THEN 1 END) AS meatlovers_ordered,
+    COUNT(CASE WHEN pizza_name = 'Vegetarian' THEN 1 END) AS vegetarians_ordered
 FROM customer_orders
 JOIN pizza_names USING (pizza_id)
 GROUP BY customer_id
@@ -544,7 +544,7 @@ WHERE cancellation IS NULL
 **Query:**
 
 ```sql
-SELECT strftime('%H', order_time) AS Hour, COUNT(*) AS `Pizzas ordered`
+SELECT strftime('%H', order_time) AS Hour, COUNT(*) AS 'Pizzas ordered'
 FROM customer_orders
 GROUP BY Hour
 ```
@@ -581,7 +581,7 @@ SELECT CASE
     WHEN strftime('%w', order_time) = '5' THEN 'Friday'
     WHEN strftime('%w', order_time) = '6' THEN 'Saturday'
     END AS Day, 
-COUNT(*) AS `Pizzas ordered`
+COUNT(*) AS 'Pizzas ordered'
 FROM customer_orders
 GROUP BY Day
 ```
@@ -602,7 +602,7 @@ GROUP BY Day
 **Query:**
 
 ```sql
-SELECT (CAST(strftime('%j', registration_date) AS INTEGER) - 1) / 7 + 1 AS Week, COUNT(*) AS `Runners registered`
+SELECT (CAST(strftime('%j', registration_date) AS INTEGER) - 1) / 7 + 1 AS Week, COUNT(*) AS 'Runners registered'
 FROM runners
 GROUP BY Week
 ```
@@ -634,7 +634,7 @@ CAST(
     ROUND(
         AVG(unixepoch(pickup_time) - unixepoch(order_time)) / 60
     ) AS INTEGER
-) AS `Average time (minutes)`
+) AS 'Average time (minutes)'
 FROM customer_orders
 JOIN runner_orders USING (order_id)
 WHERE pickup_time IS NOT NULL AND order_time IS NOT NULL
@@ -654,7 +654,7 @@ GROUP BY runner_id
 **Query:**
 
 ```sql
-SELECT order_id AS `order id`, COUNT(*) AS Pizzas, unixepoch(pickup_time) - unixepoch(order_time) AS `Order preparation (seconds)`
+SELECT order_id AS 'order id', COUNT(*) AS Pizzas, unixepoch(pickup_time) - unixepoch(order_time) AS 'Order preparation (seconds)'
 FROM customer_orders
 JOIN runner_orders USING (order_id)
 WHERE pickup_time IS NOT NULL AND order_time IS NOT NULL
@@ -689,7 +689,7 @@ See the query for question D4 for more human-readable time format usage (HH:MM:S
 **Query:**
 
 ```sql
-SELECT customer_id AS Customer, ROUND(AVG(distance), 1) AS `Average distance (km)`
+SELECT customer_id AS Customer, ROUND(AVG(distance), 1) AS 'Average distance (km)'
 FROM runner_orders
 JOIN customer_orders USING (order_id)
 WHERE cancellation IS NULL
@@ -711,7 +711,7 @@ GROUP BY customer_id
 **Query:**
 
 ```sql
-SELECT MAX(duration) - MIN(duration) AS `Maximum difference`
+SELECT MAX(duration) - MIN(duration) AS 'Maximum difference'
 FROM runner_orders
 WHERE cancellation IS NULL
 ```
@@ -727,7 +727,7 @@ WHERE cancellation IS NULL
 **Query:**
 
 ```sql
-SELECT runner_id AS Runner, order_id AS `Order`, ROUND((distance * 60/duration), 1) AS `Average speed (km/h)`
+SELECT runner_id AS Runner, order_id AS 'Order', ROUND((distance * 60/duration), 1) AS 'Average speed (km/h)'
 FROM runner_orders
 WHERE cancellation IS NULL
 GROUP BY runner_id, order_id
@@ -764,7 +764,7 @@ From the data it appears that:
 **Query:**
 
 ```sql
-SELECT runner_id AS Runner, COUNT(CASE WHEN cancellation IS NULL THEN 1 END) * 100 / COUNT(*)  AS `Delivery success percentage`
+SELECT runner_id AS Runner, COUNT(CASE WHEN cancellation IS NULL THEN 1 END) * 100 / COUNT(*)  AS 'Delivery success percentage'
 FROM runner_orders
 GROUP BY Runner
 ```
@@ -821,7 +821,7 @@ WITH counts AS (
     WHERE extra_id IS NOT NULL
     GROUP BY extra_id
 )
-SELECT topping_name AS `Most commonly added extra`
+SELECT topping_name AS 'Most commonly added extra'
 FROM counts 
 JOIN pizza_toppings ON topping_id = extra_id
 WHERE ranking = 1
@@ -849,11 +849,10 @@ WITH counts AS (
     WHERE exclusion_id IS NOT NULL
     GROUP BY exclusion_id
 )
-SELECT topping_name AS `Most common exclusion`
+SELECT topping_name AS 'Most common exclusion'
 FROM counts 
 JOIN pizza_toppings ON topping_id = exclusion_id
 WHERE ranking = 1
-
 ```
 
 **Result:**
@@ -969,7 +968,7 @@ SELECT
     CASE 
         WHEN amount = 1 THEN topping_name
         WHEN amount = 2 THEN concat('2x', topping_name)
-    END, ', ')) AS `order`
+    END, ', ')) AS 'order'
 FROM customer_orders_cleaned
 JOIN pizza_names USING (pizza_id)
 JOIN order_toppings_count USING (order_item_id)
@@ -1008,23 +1007,28 @@ GROUP BY order_item_id
 ```sql
 --Table of all the toppings per pizza ordered
 WITH delivered_order_toppings AS (
-    SELECT order_item_id, topping AS topping_id
-    FROM customer_orders_cleaned
-    JOIN pizza_recipes_clean USING (pizza_id)
-    JOIN runner_orders USING (order_id) 
-    --Remove all rows for which a combination of order_item_id and exclusion_id exists in customer_orders_exclusions
-    WHERE NOT EXISTS (
-        SELECT exclusion_id 
-        FROM customer_orders_exclusions
-        WHERE customer_orders_cleaned.order_item_id = customer_orders_exclusions.order_item_id AND topping = exclusion_id
-    ) AND cancellation IS NULL --Only consider delivered orders
-    --Add rows for every extra from the customer_orders_extras table
-    UNION ALL
-    SELECT order_item_id, extra_id
-    FROM customer_orders_extras
-    ORDER BY order_item_id, topping_id
+	SELECT order_item_id, topping AS topping_id
+	FROM customer_orders_cleaned
+	JOIN pizza_recipes_clean USING (pizza_id)
+	JOIN runner_orders USING (order_id)
+
+	--Remove all rows for which a combination of order_item_id and exclusion_id exists in customer_orders_exclusions
+	WHERE NOT EXISTS (
+		SELECT exclusion_id 
+		FROM customer_orders_exclusions
+		WHERE customer_orders_cleaned.order_item_id = customer_orders_exclusions.order_item_id AND topping = exclusion_id
+	) AND cancellation IS NULL --Only consider delivered orders
+
+	--Add rows for every extra from the customer_orders_extras table
+	UNION ALL
+	SELECT order_item_id, extra_id
+	FROM customer_orders_cleaned
+	JOIN customer_orders_extras USING (order_item_id)
+	JOIN runner_orders USING (order_id)
+	WHERE cancellation IS NULL --Only consider delivered orders
+	ORDER BY order_item_id, topping_id
 )
-SELECT topping_name, COUNT(*) AS `Amount used`
+SELECT topping_name, COUNT(*) AS 'Amount used'
 FROM delivered_order_toppings
 JOIN pizza_toppings USING (topping_id)
 GROUP BY topping_name
@@ -1033,20 +1037,20 @@ ORDER BY COUNT(*) DESC
 
 **Result:**
 
-| **topping_name** | **Amount used** |
-| ---------------- | --------------- |
-| Bacon            | 13              |
-| Mushrooms        | 11              |
-| Chicken          | 10              |
-| Cheese           | 10              |
-| Salami           | 9               |
-| Pepperoni        | 9               |
-| Beef             | 9               |
-| BBQ Sauce        | 8               |
-| Tomatoes         | 3               |
-| Tomato Sauce     | 3               |
-| Peppers          | 3               |
-| Onions           | 3               |
+| topping_name | Amount used |
+| ------------ | ----------- |
+| Bacon        | 12          |
+| Mushrooms    | 11          |
+| Cheese       | 10          |
+| Salami       | 9           |
+| Pepperoni    | 9           |
+| Chicken      | 9           |
+| Beef         | 9           |
+| BBQ Sauce    | 8           |
+| Tomatoes     | 3           |
+| Tomato Sauce | 3           |
+| Peppers      | 3           |
+| Onions       | 3           |
 
 ### D. Pricing and Ratings
 
@@ -1059,7 +1063,7 @@ SELECT SUM(
     CASE
         WHEN pizza_id = 1 THEN 12
         WHEN pizza_id = 2 THEN 10 --No ELSE statement in case more pizzas are added later
-    END) AS `Pizza Runner revenue (dollars)`
+    END) AS 'Pizza Runner revenue (dollars)'
 FROM customer_orders
 ```
 
@@ -1090,7 +1094,7 @@ SELECT SUM(
     CASE
         WHEN pizza_id = 1 THEN 12
         WHEN pizza_id = 2 THEN 10 
-    END) + extras_count * 1 AS `Pizza Runner revenue (dollars)` --If topping costs change, change the `* 1` here accordingly
+    END) + extras_count * 1 AS 'Pizza Runner revenue (dollars)' --If topping costs change, change the '* 1' here accordingly
 FROM customer_orders_cleaned
 CROSS JOIN total_extras 
 ```
@@ -1106,10 +1110,10 @@ CROSS JOIN total_extras
 **Query:**
 
 ```sql
-CREATE TABLE IF NOT EXISTS `order_rating` (
-    `order_id` INTEGER,
-    `rating` INTEGER,
-    FOREIGN KEY(`order_id`) REFERENCES `runner_orders`(`order_id`)
+CREATE TABLE IF NOT EXISTS 'order_rating' (
+    'order_id' INTEGER,
+    'rating' INTEGER,
+    FOREIGN KEY('order_id') REFERENCES 'runner_orders'('order_id')
 );
 
 INSERT INTO order_rating 
@@ -1180,10 +1184,10 @@ SELECT
     rating, 
     order_time, 
     pickup_time, 
-    time(unixepoch(pickup_time) - unixepoch(order_time), 'unixepoch') AS `Time between order and pickup`, 
-    duration AS `Delivery duration (minutes)`, 
-    ROUND((distance * 60/duration), 1) AS `Average speed (km/h)`,
-    COUNT(*) AS `Total number of pizzas`
+    time(unixepoch(pickup_time) - unixepoch(order_time), 'unixepoch') AS 'Time between order and pickup', 
+    duration AS 'Delivery duration (minutes)', 
+    ROUND((distance * 60/duration), 1) AS 'Average speed (km/h)',
+    COUNT(*) AS 'Total number of pizzas'
 FROM customer_orders
 JOIN runner_orders USING (order_id)
 JOIN order_rating USING (order_id)
@@ -1217,7 +1221,7 @@ WITH pizza_runner_revenue AS (
         END) AS revenue
         FROM customer_orders
 )
-SELECT revenue - (SUM(distance) * 0.30) AS `Profit (dollars)`
+SELECT revenue - (SUM(distance) * 0.30) AS 'Profit (dollars)'
 FROM runner_orders
 CROSS JOIN pizza_runner_revenue --Match the single revenue number to every row in runner_orders
 WHERE cancellation IS NULL
@@ -1319,4 +1323,4 @@ VALUES
 
 **Answer:**
 
-Adding a new pizza to the Pizza Runner menu comes down to inserting into `pizza_recipes` and `pizza_names`. You could run the recursive string_split query again to recreate `pizza_recipes_clean`, but I chose to insert the values manually since it was quicker to do it that way and one wouldn’t expect the menu to change very often.
+Adding a new pizza to the Pizza Runner menu comes down to inserting into `pizza_recipes` and `pizza_names`. You could run the recursive `string_split` query again to recreate `pizza_recipes_clean`, but I chose to insert the values manually since it was quicker to do it that way and one wouldn’t expect the menu to change very often.
