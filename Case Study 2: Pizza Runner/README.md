@@ -11,7 +11,7 @@ https://8weeksqlchallenge.com/case-study-2/
 * Recursive CTEs and `UNION ALL`.
 * Usage of `substr()` to find a part of a string.
 * Usage of `instr()` to find the position of some part of a string.
-* Usage of `strftime()` to parse and manipulate date/time formats.
+* More ways to parse and manipulate date/time formats (`strftime()`, `unixepoch()`, etc.).
 * Proper SQL standard of using single quotes for string literals, and double quotes for delimited identifiers (identifier names that otherwise would be syntactically invalid).
   * SQLite let me get away with ignoring this for a while.
 * Usage of the aggregate function `group_concat()`.
