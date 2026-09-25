@@ -251,9 +251,9 @@ Using `CASE WHEN` statement as `IF-THEN` programming logic to more easily differ
 
 ```sql
 SELECT customer_id, SUM(CASE 
-    WHEN product_name = "sushi" THEN 20 * price
-    WHEN order_date - members.join_date <= 7 AND order_date - members.join_date >= 0 THEN 20 * price 
-    ELSE 10 * price END) AS total_points
+	WHEN product_name = "sushi" THEN 20 * price
+	WHEN order_date < date(members.join_date, '+7 days') AND order_date >= members.join_date THEN 20 * price 
+	ELSE 10 * price END) AS total_points
 FROM sales
 JOIN menu USING (product_id)
 JOIN members USING (customer_id)
@@ -265,8 +265,12 @@ GROUP BY customer_id
 
 | **customer_id** | **total_points** |
 | --------------- | ---------------- |
-| A               | 1520             |
-| B               | 1240             |
+| A               | 1370             |
+| B               | 820              |
+
+**Learned:**
+
+Usage of `date()` to manipulate date formats.
 
 **Note:**
 
