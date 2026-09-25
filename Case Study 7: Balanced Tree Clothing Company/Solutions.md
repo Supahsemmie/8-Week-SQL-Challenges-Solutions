@@ -618,37 +618,37 @@ ORDER BY transaction_penetration DESC
 
 ```sql
 WITH triples AS (
-    SELECT 
-        txn_id,
-        s1.prod_id AS product_1,
-        s2.prod_id AS product_2,
-        s3.prod_id AS product_3,
-        concat(p1.product_name, ', ', p2.product_name, ', ', p3.product_name) AS triple
-    FROM sales s1
-    JOIN sales s2 USING (txn_id)
-    JOIN sales s3 USING (txn_id)
-    JOIN product_details p1 ON 
-        s1.prod_id = p1.product_id
-    JOIN product_details p2 ON 
-        s2.prod_id = p2.product_id
-    JOIN product_details p3 ON 
-        s3.prod_id = p3.product_id
-    WHERE 
-        --Ordering removes duplicate triples
-        product_1 < product_2
-        AND 
-        product_2 < product_3
-        AND s1.qty > 0
-        AND s2.qty > 0
-        AND s3.qty > 0
+	SELECT 
+		txn_id,
+		concat(p1.product_name, ', ', p2.product_name, ', ', p3.product_name) AS triple
+	FROM sales s1
+	--Self joining on txn_id creates permutations for every transaction
+	JOIN sales s2 USING (txn_id)
+	JOIN sales s3 USING (txn_id)
+	--Get product names for every product in a triple
+	JOIN product_details p1 ON 
+		s1.prod_id = p1.product_id
+	JOIN product_details p2 ON 
+		s2.prod_id = p2.product_id
+	JOIN product_details p3 ON 
+		s3.prod_id = p3.product_id
+	WHERE 
+		--Ordering removes duplicate triples
+		s1.prod_id < s2.prod_id
+		AND 
+		s2.prod_id < s3.prod_id
+		--Failsafe if any quantities are accidentally put in as 0 or lower
+		AND s1.qty > 0
+		AND s2.qty > 0
+		AND s3.qty > 0
 )
 SELECT
-    triple,
-    COUNT(*) AS Amount
+	triple,
+	COUNT(*) AS Amount
 FROM triples 
 GROUP BY triple
 ORDER BY Amount DESC 
-LIMIT 1 
+LIMIT 1
 ```
 
 **Result:**
@@ -1098,33 +1098,33 @@ ORDER BY transaction_penetration DESC;
    ====================================================================== */
 
 WITH triples AS (
-    SELECT 
-        txn_id,
-        s1.prod_id AS product_1,
-        s2.prod_id AS product_2,
-        s3.prod_id AS product_3,
-        concat(p1.product_name, ', ', p2.product_name, ', ', p3.product_name) AS triple
-    FROM monthly_sales s1
-    JOIN monthly_sales s2 USING (txn_id)
-    JOIN monthly_sales s3 USING (txn_id)
-    JOIN product_details p1 ON 
-        s1.prod_id = p1.product_id
-    JOIN product_details p2 ON 
-        s2.prod_id = p2.product_id
-    JOIN product_details p3 ON 
-        s3.prod_id = p3.product_id
-    WHERE 
-        --Ordering removes duplicate triples
-        product_1 < product_2
-        AND 
-        product_2 < product_3
-        AND s1.qty > 0
-        AND s2.qty > 0
-        AND s3.qty > 0
+	SELECT 
+		txn_id,
+		concat(p1.product_name, ', ', p2.product_name, ', ', p3.product_name) AS triple
+	FROM sales s1
+	--Self joining on txn_id creates permutations for every transaction
+	JOIN sales s2 USING (txn_id)
+	JOIN sales s3 USING (txn_id)
+	--Get product names for every product in a triple
+	JOIN product_details p1 ON 
+		s1.prod_id = p1.product_id
+	JOIN product_details p2 ON 
+		s2.prod_id = p2.product_id
+	JOIN product_details p3 ON 
+		s3.prod_id = p3.product_id
+	WHERE 
+		--Ordering removes duplicate triples
+		s1.prod_id < s2.prod_id
+		AND 
+		s2.prod_id < s3.prod_id
+		--Failsafe if any quantities are accidentally put in as 0 or lower
+		AND s1.qty > 0
+		AND s2.qty > 0
+		AND s3.qty > 0
 )
 SELECT
-    triple,
-    COUNT(*) AS Amount
+	triple,
+	COUNT(*) AS Amount
 FROM triples 
 GROUP BY triple
 ORDER BY Amount DESC 
