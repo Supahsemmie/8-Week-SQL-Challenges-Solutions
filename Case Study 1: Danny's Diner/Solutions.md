@@ -276,7 +276,7 @@ Usage of `date()` to manipulate date formats.
 
 Once again I assume that customers get points before joining the loyalty program too, just like customer C in question 9 got points even though they aren’t a member.
 
-If the intended interpretation was that points are *only awarded after joining the program*, then I would add an extra case to the `CASE WHEN` statement that checks at the start if the “order_date” is smaller than or equal to the “join_date” (signifying non-membership), in which case the returned value should be 0 points.
+If the intended interpretation was that points are *only awarded after joining the program*, then I would add an extra case to the `CASE WHEN` statement that checks at the start if the `order_date` is smaller than or equal to the `join_date` (signifying non-membership), in which case the returned value should be 0 points.
 
 # Bonus:
 
