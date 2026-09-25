@@ -12,6 +12,7 @@ https://8weeksqlchallenge.com/case-study-1/
 * Working with CTEs (Common Table Expressions) to create readable pipelines for the code rather than making one big `SELECT` statement.
 * `USING` keyword to join two tables on an identically named column as a shortcut.
 * Using `CASE WHEN` statements as an analogue to `IF-THEN` programming logic.
+* Using the `date()` function to compare and manipulate dates.
 * First taste of window functions via use of the `RANK()` function.
 
 ## Introduction
