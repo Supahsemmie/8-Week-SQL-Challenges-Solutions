@@ -126,38 +126,39 @@ This is because if you are counting based on a condition, then the result of the
 
 5. *Summarise the `id` values in the `fresh_segments.interest_map` by its total record count in this table*
 
-**Note:**
-
-I am going to assume that the intention is to count how many times every `id` value from `interest_map` occurs in `interest_metrics`. Otherwise, this would be a trivial question, since every `id` only occurs exactly once in `interest_map`.
-
 **Query:**
 
 
 ```sql
+WITH interest_frequencies AS (
+	SELECT 
+		id,
+		COUNT(*) AS frequency
+	FROM interest_map
+	WHERE id IS NOT NULL
+	GROUP BY id
+)
 SELECT 
-    id,
-    interest_name,
-    COUNT(*) AS amount
-FROM interest_metrics
-LEFT JOIN interest_map ON interest_id = id
-WHERE id IS NOT NULL
-GROUP BY id
+	COUNT(
+		CASE 
+			WHEN frequency = 1 
+			THEN 1
+		END
+	) AS single_record_count_ids,
+	COUNT(
+		CASE 
+			WHEN frequency > 1 
+			THEN 1
+		END
+	) AS duplicates
+FROM interest_frequencies
 ```
 
-**Result (first 10 rows):**
+**Result**
 
-| **id** | **interest_name**         | **amount** |
-| ------ | ------------------------- | ---------- |
-| 1      | Fitness Enthusiasts       | 12         |
-| 2      | Gamers                    | 11         |
-| 3      | Car Enthusiasts           | 10         |
-| 4      | Luxury Retail Researchers | 14         |
-| 5      | Brides & Wedding Planners | 14         |
-| 6      | Vacation Planners         | 14         |
-| 7      | Motorcycle Enthusiasts    | 11         |
-| 8      | Business News Readers     | 13         |
-| 12     | Thrift Store Shoppers     | 14         |
-| 13     | Advertising Professionals | 13         |
+| single_record_count_ids | duplicates |
+| ----------------------- | ---------------------- |
+| 1209                    | 0                      |
 
 6. *What sort of table join should we perform for our analysis and why? Check your logic by checking the rows where `interest_id = 21246` in your joined output and include all columns from `fresh_segments.interest_metrics` and all columns from `fresh_segments.interest_map` except from the `id` column.*
 
