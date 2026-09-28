@@ -1,6 +1,6 @@
 # The 8-Week SQL Challenges
 
-This is a learning repository of my solutions to all the questions from the 8 case studies found [here](https://8weeksqlchallenge.com/) (created by Danny Ma). Thank you for this great resource Danny! 
+This is a learning repository of my solutions to *every single question* from the 8 case studies found [here](https://8weeksqlchallenge.com/) (created by Danny Ma). Thank you for this great resource Danny! 
 
 These case studies cover different aspects of data analysis used in several business sectors, such as (online) banking, shopping, marketing, subscription based services and more!
 
