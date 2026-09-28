@@ -661,19 +661,15 @@ In my opinion the second scenario is preferable, so I have decided to use `ROW_N
 **Query:**
 
 ```sql
-WITH avg_rankings AS ( 
-    SELECT 
-        interest_id,
-        interest_name,
-        AVG(ranking) AS avg_ranking
-    FROM filtered_interests
-    GROUP BY interest_id
-)
-SELECT
-    interest_id,
-    interest_name,
-    ROUND(avg_ranking, 1) AS avg_ranking
-FROM avg_rankings
+SELECT 
+	interest_id,
+	interest_name,
+	ROUND(
+		AVG(ranking),
+		1
+	) AS avg_ranking
+FROM filtered_interests
+GROUP BY interest_id
 ORDER BY avg_ranking ASC
 LIMIT 5
 ```
@@ -693,19 +689,15 @@ LIMIT 5
 **Query:**
 
 ```sql
-WITH stdev_percentile_rankings AS ( 
-    SELECT 
-        interest_id,
-        interest_name,
-        stats_stddev(percentile_ranking) AS stdev_percentile_ranking
-    FROM filtered_interests
-    GROUP BY interest_id
-)
-SELECT
-    interest_id,
-    interest_name,
-    ROUND(stdev_percentile_ranking, 2) AS stdev_percentile_ranking
-FROM stdev_percentile_rankings
+SELECT 
+	interest_id,
+	interest_name,
+	ROUND(
+		stats_stddev(percentile_ranking),
+		2
+	) AS stdev_percentile_ranking
+FROM filtered_interests
+GROUP BY interest_id
 ORDER BY stdev_percentile_ranking DESC
 LIMIT 5
 ```
