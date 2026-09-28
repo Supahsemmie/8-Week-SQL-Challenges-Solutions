@@ -343,57 +343,64 @@ The idea  is to take `time_to_annual` and divide it by 30, then take the ceiling
 
 ```sql
 WITH trial_dates AS (
-    SELECT customer_id, start_date AS trial_date
-    FROM subscriptions
-    WHERE plan_id = 0
+	SELECT customer_id, start_date AS trial_date
+	FROM subscriptions
+	WHERE plan_id = 0
 ),
 annual_dates AS (
-    SELECT customer_id, start_date AS annual_date
-    FROM subscriptions
-    WHERE plan_id = 3
+	SELECT customer_id, start_date AS annual_date
+	FROM subscriptions
+	WHERE plan_id = 3
 ),
 times_to_annual AS (
-    SELECT customer_id, julianday(annual_date) - julianday(trial_date) AS time_to_annual 
-    FROM trial_dates
-    JOIN annual_dates USING (customer_id)
+	SELECT customer_id, julianday(annual_date) - julianday(trial_date) AS time_to_annual 
+	FROM trial_dates
+	JOIN annual_dates USING (customer_id)
 ),
---Divide the times_to_annual into 30-day buckets (bucket 1, bucket 2 etc.) and count how many are in each bucket
+--Divide the times_to_annual into 30-day buckets (bucket 1, bucket 2 etc.) and count/average over each bucket
 day_breakdown AS (
-    SELECT 
-        CAST(
-            CEILING(time_to_annual / 30) --Division by 30 calculates what 30-day period time_to_annual is in
-        AS INTEGER) AS bucket,
-        COUNT(*) AS "Amount"
-    FROM times_to_annual
-    GROUP BY CEILING(time_to_annual / 30)
+	SELECT 
+		CAST(
+			CEILING(time_to_annual / 30) --Division by 30 calculates what 30-day period time_to_annual is in
+			AS INTEGER
+		) AS bucket,
+		COUNT(*) AS amount,
+		ROUND(
+			AVG(time_to_annual),
+			2
+		) AS avg_time
+	FROM times_to_annual
+	GROUP BY bucket
 )
 --Rename the buckets to 0-30, 31-60 etc.
 SELECT 
-    concat(
-        CASE 
-            WHEN bucket = 1 THEN '0' --The first period is an exception starting with 0 rather than 1
-            ELSE bucket * 30 - 29
-        END, '-', bucket * 30) AS "30-day period", 
-        Amount
+	concat(
+		CASE 
+			WHEN bucket = 1 THEN '0' --The first period is an exception starting with 0 rather than 1
+			ELSE (bucket - 1) * 30 + 1
+		END, '-', bucket * 30
+	) AS "30-day period",
+	amount,
+	avg_time
 FROM day_breakdown
 ```
 
 **Result:**
 
-| **30-day period** | **Amount** |
-| ----------------- | ---------- |
-| 0-30              | 49         |
-| 31-60             | 24         |
-| 61-90             | 34         |
-| 91-120            | 35         |
-| 121-150           | 42         |
-| 151-180           | 36         |
-| 181-210           | 26         |
-| 211-240           | 4          |
-| 241-270           | 5          |
-| 271-300           | 1          |
-| 301-330           | 1          |
-| 331-360           | 1          |
+| 30-day period | amount | avg_time |
+| ------------- | ------ | -------- |
+| 0-30          | 49     | 9.96     |
+| 31-60         | 24     | 42.33    |
+| 61-90         | 34     | 71.44    |
+| 91-120        | 35     | 100.69   |
+| 121-150       | 42     | 133.36   |
+| 151-180       | 36     | 162.06   |
+| 181-210       | 26     | 190.73   |
+| 211-240       | 4      | 224.25   |
+| 241-270       | 5      | 257.2    |
+| 271-300       | 1      | 285.0    |
+| 301-330       | 1      | 327.0    |
+| 331-360       | 1      | 346.0    |
 
 **Distribution graph:**
 
