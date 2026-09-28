@@ -651,32 +651,33 @@ SELECT
 FROM visits v
 LEFT JOIN campaign_identifier c ON date(v.visit_start_time) BETWEEN c.start_date AND c.end_date 
 LEFT JOIN cart_products USING (visit_id)
+ORDER BY user_id
 ```
 
 **Result (first 20 rows):**
 
-| user_id | visit_id | visit_start_time           | page_views | cart_adds | purchase | campaign_name                     | impression | click | cart_products                                                                   |
-| ------- | -------- | -------------------------- | ---------- | --------- | -------- | --------------------------------- | ---------- | ----- | ------------------------------------------------------------------------------- |
-| 155     | 001597   | 2020-02-17 00:21:45.295141 | 10         | 6         | 1        | Half Off - Treat Your Shellf(ish) | 1          | 1     | Salmon, Russian Caviar, Black Truffle, Lobster, Crab, Oyster                    |
-| 243     | 002809   | 2020-03-13 17:49:55.45987  | 4          | 0         | 0        | Half Off - Treat Your Shellf(ish) | 0          | 0     |                                                                                 |
-| 78      | 0048b2   | 2020-02-10 02:59:51.335452 | 6          | 4         | 0        | Half Off - Treat Your Shellf(ish) | 0          | 0     | Kingfish, Russian Caviar, Abalone, Lobster                                      |
-| 228     | 004aaf   | 2020-03-18 13:23:07.97394  | 6          | 2         | 1        | Half Off - Treat Your Shellf(ish) | 0          | 0     | Tuna, Lobster                                                                   |
-| 237     | 005fe7   | 2020-04-02 18:14:08.257711 | 9          | 4         | 1        |                                   | 0          | 0     | Kingfish, Black Truffle, Crab, Oyster                                           |
-| 420     | 006a61   | 2020-01-25 20:54:14.630253 | 9          | 5         | 1        | 25% Off - Living The Lux Life     | 1          | 1     | Tuna, Russian Caviar, Black Truffle, Abalone, Crab                              |
-| 252     | 006e8c   | 2020-02-21 03:14:44.965938 | 1          | 0         | 0        | Half Off - Treat Your Shellf(ish) | 0          | 0     |                                                                                 |
-| 20      | 006f7f   | 2020-02-23 01:36:34.786358 | 5          | 1         | 1        | Half Off - Treat Your Shellf(ish) | 1          | 1     | Tuna                                                                            |
-| 436     | 007330   | 2020-01-07 22:30:35.775068 | 11         | 8         | 1        | BOGOF - Fishing For Compliments   | 1          | 1     | Salmon, Kingfish, Tuna, Russian Caviar, Black Truffle, Abalone, Lobster, Oyster |
-| 161     | 009e0e   | 2020-02-20 06:17:50.907354 | 8          | 5         | 0        | Half Off - Treat Your Shellf(ish) | 0          | 0     | Kingfish, Tuna, Black Truffle, Abalone, Lobster                                 |
-| 101     | 00b0a0   | 2020-05-17 06:29:28.529595 | 7          | 3         | 1        |                                   | 0          | 0     | Tuna, Lobster, Crab                                                             |
-| 50      | 00b161   | 2020-03-15 00:24:29.191625 | 11         | 6         | 1        | Half Off - Treat Your Shellf(ish) | 1          | 1     | Kingfish, Tuna, Abalone, Lobster, Crab, Oyster                                  |
-| 326     | 00c08c   | 2020-02-09 06:50:09.453729 | 7          | 1         | 1        | Half Off - Treat Your Shellf(ish) | 1          | 0     | Abalone                                                                         |
-| 282     | 00fb4a   | 2020-03-20 22:57:13.601341 | 6          | 0         | 0        | Half Off - Treat Your Shellf(ish) | 0          | 0     |                                                                                 |
-| 213     | 010e34   | 2020-01-18 17:41:09.67703  | 1          | 0         | 0        | 25% Off - Living The Lux Life     | 0          | 0     |                                                                                 |
-| 158     | 011e83   | 2020-03-04 19:37:19.989454 | 6          | 2         | 1        | Half Off - Treat Your Shellf(ish) | 0          | 0     | Salmon, Lobster                                                                 |
-| 429     | 012599   | 2020-02-17 07:56:15.329003 | 1          | 0         | 0        | Half Off - Treat Your Shellf(ish) | 0          | 0     |                                                                                 |
-| 208     | 01573b   | 2020-01-30 12:41:23.073956 | 6          | 2         | 1        |                                   | 0          | 0     | Black Truffle, Lobster                                                          |
-| 120     | 016012   | 2020-02-14 07:41:49.486058 | 8          | 2         | 1        | Half Off - Treat Your Shellf(ish) | 0          | 0     | Salmon, Crab                                                                    |
-| 454     | 0186ac   | 2020-02-20 23:30:13.675286 | 9          | 6         | 1        | Half Off - Treat Your Shellf(ish) | 1          | 1     | Salmon, Kingfish, Russian Caviar, Black Truffle, Abalone, Crab                  |
+| user_id | visit_id | visit_start_time           | page_views | cart_adds | purchase | campaign_name                     | impression | click | cart_products                                                                         |
+| ------- | -------- | -------------------------- | ---------- | --------- | -------- | --------------------------------- | ---------- | ----- | ------------------------------------------------------------------------------------- |
+| 1       | 02a5d5   | 2020-02-26 16:57:26.260871 | 4          | 0         | 0        | Half Off - Treat Your Shellf(ish) | 0          | 0     |                                                                                       |
+| 1       | 0826dc   | 2020-02-26 05:58:37.918618 | 1          | 0         | 0        | Half Off - Treat Your Shellf(ish) | 0          | 0     |                                                                                       |
+| 1       | 0fc437   | 2020-02-04 17:49:49.602976 | 10         | 6         | 1        | Half Off - Treat Your Shellf(ish) | 1          | 1     | Tuna, Russian Caviar, Black Truffle, Abalone, Crab, Oyster                            |
+| 1       | 30b94d   | 2020-03-15 13:12:54.023936 | 9          | 7         | 1        | Half Off - Treat Your Shellf(ish) | 1          | 1     | Salmon, Kingfish, Tuna, Russian Caviar, Abalone, Lobster, Crab                        |
+| 1       | 41355d   | 2020-03-25 00:11:17.860655 | 6          | 1         | 0        | Half Off - Treat Your Shellf(ish) | 0          | 0     | Lobster                                                                               |
+| 1       | ccf365   | 2020-02-04 19:16:09.182546 | 7          | 3         | 1        | Half Off - Treat Your Shellf(ish) | 0          | 0     | Lobster, Crab, Oyster                                                                 |
+| 1       | eaffde   | 2020-03-25 20:06:32.342989 | 10         | 8         | 1        | Half Off - Treat Your Shellf(ish) | 1          | 1     | Salmon, Tuna, Russian Caviar, Black Truffle, Abalone, Lobster, Crab, Oyster           |
+| 1       | f7c798   | 2020-03-15 02:23:26.312543 | 9          | 3         | 1        | Half Off - Treat Your Shellf(ish) | 0          | 0     | Russian Caviar, Crab, Oyster                                                          |
+| 2       | 0635fb   | 2020-02-16 06:42:42.73573  | 9          | 4         | 1        | Half Off - Treat Your Shellf(ish) | 0          | 0     | Salmon, Kingfish, Abalone, Crab                                                       |
+| 2       | 1f1198   | 2020-02-01 21:51:55.078775 | 1          | 0         | 0        | Half Off - Treat Your Shellf(ish) | 0          | 0     |                                                                                       |
+| 2       | 3b5871   | 2020-01-18 10:16:32.158475 | 9          | 6         | 1        | 25% Off - Living The Lux Life     | 1          | 1     | Salmon, Kingfish, Russian Caviar, Black Truffle, Lobster, Oyster                      |
+| 2       | 49d73d   | 2020-02-16 06:21:27.138532 | 11         | 9         | 1        | Half Off - Treat Your Shellf(ish) | 1          | 1     | Salmon, Kingfish, Tuna, Russian Caviar, Black Truffle, Abalone, Lobster, Crab, Oyster |
+| 2       | 910d9a   | 2020-02-01 10:40:46.875968 | 8          | 1         | 0        | Half Off - Treat Your Shellf(ish) | 0          | 0     | Abalone                                                                               |
+| 2       | c5c0ee   | 2020-01-18 10:35:22.765382 | 1          | 0         | 0        | 25% Off - Living The Lux Life     | 0          | 0     |                                                                                       |
+| 2       | d58cbd   | 2020-01-18 23:40:54.761906 | 8          | 4         | 0        | 25% Off - Living The Lux Life     | 0          | 0     | Kingfish, Tuna, Abalone, Crab                                                         |
+| 2       | e26a84   | 2020-01-18 16:06:40.90728  | 6          | 2         | 1        | 25% Off - Living The Lux Life     | 0          | 0     | Salmon, Oyster                                                                        |
+| 3       | 25502e   | 2020-02-21 11:26:15.353389 | 1          | 0         | 0        | Half Off - Treat Your Shellf(ish) | 0          | 0     |                                                                                       |
+| 3       | 76ee84   | 2020-05-28 20:11:54.997406 | 7          | 3         | 1        |                                   | 0          | 0     | Salmon, Lobster, Crab                                                                 |
+| 3       | 791afc   | 2020-04-29 00:37:16.741118 | 8          | 2         | 1        |                                   | 0          | 0     | Salmon, Oyster                                                                        |
+| 3       | 7e89a0   | 2020-05-28 10:57:51.749847 | 9          | 6         | 0        |                                   | 1          | 1     | Salmon, Tuna, Russian Caviar, Black Truffle, Lobster, Crab                            |
 
 **Note/learned:**
 
