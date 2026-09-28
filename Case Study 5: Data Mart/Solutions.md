@@ -492,12 +492,12 @@ CROSS JOIN best_demographic
 
 The `avg_transaction` column calculates the averages over a week-long period. We cannot deduce the yearly averages from this metric without accounting for the amount of transactions that the weekly averages were individually taken over. You cannot just “average the averages” as you have lost crucial information during the first aggregation.
 
-For example, if one week has only 10 transactions with a sales value of 100 and another week has 10000 transactions with a sales value of 10000, then the first week has an average transaction value of 10, and the second week has an average of 1. The average of these averages is 5.5. Week 2 however had *so many more transactions*, that if we take the average of the two weeks combined, we get
+For example, if one week has only 10 transactions with a sales value of 100 and another week has 10000 transactions with a sales value of 10000, then the first week has an average transaction value of 10, and the second week has an average of 1. The average of these averages is 5.5. Week 2 however had *so many more transactions*, that if we take the average of the two weeks combined, we get the real average:
 
-$10000 + \frac{100}{10000} + 10 \approx 1.009…$
+$\frac{10000 + 100}{10000  + 10} \approx 1.009...$
 
 The 10 transactions from week 1 are given too much weight if weeks 1 and 2 are weighted equally. 
-So, we first get the total sum of transactions and sales per year for Retail vs Shopify, and then divide to average out at the end.
+So, we first get the total sales and total transactions per year for Retail vs Shopify, and then divide to find the correct averages.
 
 **Query:**
 
