@@ -105,30 +105,28 @@ FROM products_per_txn
 
 ```sql
 WITH revenue_per_txn AS (
-    SELECT 
-        txn_id,
-        SUM(price) 
-        *
-        qty
-        *
-        CAST(
-            100 - discount AS REAL
-        ) / 100 AS revenue
-    FROM sales
-    GROUP BY txn_id
+	SELECT 
+		txn_id,
+		SUM(price * qty) 
+		*
+		CAST(
+			100 - discount AS REAL
+		) / 100 AS revenue
+	FROM sales
+	GROUP BY txn_id
 )
 SELECT 
-    ROUND(percentile_25(revenue), 2) AS "25th percentile_rpt",
-    ROUND(median(revenue), 2) "50th percentile_rpt",
-    ROUND(percentile_75(revenue), 2) "75th percentile_rpt"
+	ROUND(percentile_25(revenue), 2) AS "25th percentile_rpt",
+	ROUND(median(revenue), 2) "50th percentile_rpt",
+	ROUND(percentile_75(revenue), 2) "75th percentile_rpt"
 FROM revenue_per_txn
 ```
 
 **Result:**
 
-| 25th percentile\_rpt | 50th percentile\_rpt | 75th percentile\_rpt |
-| :---: | :---: | :---: |
-| 229.35 | 414.2 | 628.32 |
+| 25th percentile_rpt | 50th percentile_rpt | 75th percentile_rpt |
+| ------------------- | ------------------- | ------------------- |
+| 326.41              | 441.23              | 572.76              |
 
 **Note:**
 
@@ -204,38 +202,36 @@ FROM members_txn_percentage
 
 ```sql
 WITH revenues AS (
-    SELECT 
-        txn_id,
-        member,
-        SUM(price) 
-        *
-        qty
-        *
-        CAST(
-            100 - discount AS REAL
-        ) / 100 AS revenue
-    FROM sales
-    GROUP BY txn_id, member
+	SELECT 
+		txn_id,
+		member,
+		SUM(price * qty) 
+		*
+		CAST(
+			100 - discount AS REAL
+		) / 100 AS revenue
+	FROM sales
+	GROUP BY txn_id, member
 )
 SELECT 
-    ROUND(
-        AVG(
-            CASE 
-                WHEN member = 't'
-                THEN revenue
-            END
-        ),
-        2
-    ) AS average_member_revenue,
-    ROUND(
-        AVG(
-            CASE 
-                WHEN member = 'f'
-                THEN revenue
-            END
-        ),
-        2
-    ) AS average_non_member_revenue
+	ROUND(
+		AVG(
+			CASE 
+				WHEN member = 't'
+				THEN revenue
+			END
+		),
+		2
+	) AS average_member_revenue,
+	ROUND(
+		AVG(
+			CASE 
+				WHEN member = 'f'
+				THEN revenue
+			END
+		),
+		2
+	) AS average_non_member_revenue
 FROM revenues
 ```
 
@@ -243,7 +239,7 @@ FROM revenues
 
 | average\_member\_revenue | average\_non\_member\_revenue |
 | :---: | :---: |
-| 458.03 | 455.81 |
+| 454.14 | 452.01 |
 
 ### 
 
@@ -744,9 +740,7 @@ WITH products_per_txn AS (
 revenue_per_txn AS (
     SELECT 
         txn_id,
-        SUM(price) 
-        *
-		qty
+        SUM(price * qty) 
 		*
         CAST(
             100 - discount AS REAL
@@ -801,8 +795,6 @@ JOIN revenue_per_txn r USING (txn_id)
 JOIN discount_per_transaction USING (txn_id)
 CROSS JOIN members_txn_percentage;
 
-
-
 /* ======================================================================
    Question that has to be answered on the (txn_id, member) level
    
@@ -815,9 +807,7 @@ WITH revenues AS (
     SELECT 
         txn_id,
         member,
-        SUM(price) 
-        *
-		qty 
+        SUM(price * qty) 
 		*
         CAST(
             100 - discount AS REAL
@@ -1155,13 +1145,13 @@ LIMIT 1
 
 | unique\_transactions | average\_unique\_products | 25th percentile\_rpt | 50th percentile\_rpt | 75th percentile\_rpt | avg\_discount\_per\_txn | members\_vs\_non\_members\_split |
 | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| 828 | 5.99 | 226.27 | 417.3 | 617.76 | 62.3 | 59.4/40.6 |
+| 828 | 5.99 | 226.27 | 434.1 | 563.69 | 62.3 | 59.4/40.6 |
 
 6\. *What is the average revenue for member transactions and non-member transactions?*
 
 | average\_member\_revenue | average\_non\_member\_revenue |
 | :---: | :---: |
-| 455.41 | 441.84 |
+| 451.93 | 436.71 |
 
 **Product analysis:** 
 
